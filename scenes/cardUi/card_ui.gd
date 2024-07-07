@@ -4,13 +4,21 @@ extends Control
 signal reparent_requested(which_card_ui: CardUI)
 
 @onready var color: ColorRect = $Color
-@onready var state: Label = $State
 @onready var card_state_machine: CardStateMachine = $CardStateMachine as CardStateMachine
 @onready var drop_point_detector = $DropPointDetector
 @onready var targets: Array[Node] = []
+@onready var card_image = $CardImage
+
+var player: int
+var value: int
+var symbol: int
+var default_card: String = "card back/cardBackBlue"
+var card_cover: String
+var card_visible: bool = false
 
 func _ready() -> void:
 	card_state_machine.init(self)
+	show_card()
 	
 func _input(event: InputEvent) -> void:
 	card_state_machine.on_input(event)
@@ -30,3 +38,20 @@ func _on_drop_point_detector_area_entered(area):
 
 func _on_drop_point_detector_area_exited(area):
 	targets.erase(area)
+
+func show_card():
+	if card_visible:
+		card_image.texture = load("res://Graphics/cards/" + card_cover + ".png")
+	else: 
+		card_image.texture = load("res://Graphics/cards/" + default_card + ".png")
+		
+func card_clicked():
+	self.color.visible = false
+	var tween = create_tween()
+	var newPosition = self.get_parent().positionInTable
+	tween.tween_property(self, "global_position", newPosition , 0.5)
+	await tween.finished
+	var ui_layer := get_tree().get_first_node_in_group("table")
+	if ui_layer:
+		self.reparent(ui_layer)
+	
