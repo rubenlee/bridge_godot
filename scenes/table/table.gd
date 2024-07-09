@@ -84,7 +84,9 @@ func _on_button_pressed():
 				$Player4/Hand.add_card(card)
 		counter %= 4
 	$Player1/Hand.reconnect_signals()
+	$Player2/Hand.reconnect_signals()
 	$Player3/Hand.reconnect_signals()
+	$Player4/Hand.reconnect_signals()
 	print($Player1/Hand.get_child_count(), "-", $Player3/Hand.get_child_count())
 	print($Player2/Hand.get_child_count(), "-", $Player4/Hand.get_child_count())
 	$Player1/Hand.start_turn()
@@ -278,7 +280,7 @@ func check_winner_of_round() -> int:
 			direction = Vector2(1380,360)
 			$Panel/LostCounter.text = str($Panel/LostCounter.text.to_int() + 1 )
 	for child in table_layer.get_children():
-		tween.tween_property(child, "global_position", direction , 0.5)
+		tween.tween_property(child, "global_position", direction , 1)
 	await tween.finished
 	for child in table_layer.get_children():
 		child.reparent(new_node)

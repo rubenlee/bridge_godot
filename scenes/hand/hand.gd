@@ -112,7 +112,7 @@ func start_turn():
 				no_trumph_thinking()
 			_:
 				child.card_clicked()
-		_on_card_played()
+			#_on_card_played()
 	
 func no_trumph_thinking() -> void:
 	var table_layer := get_tree().get_first_node_in_group("table")
@@ -147,4 +147,4 @@ func no_trumph_thinking() -> void:
 			continue
 		var card_ui = child as CardUI
 		if card_ui.value == value_used and card_ui.symbol == symbol_used:
-			child.card_clicked()
+			await child.card_clicked()
