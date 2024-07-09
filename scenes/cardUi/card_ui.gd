@@ -2,6 +2,7 @@ class_name CardUI
 extends Control
 
 signal reparent_requested(which_card_ui: CardUI)
+signal card_played()
 
 @onready var color: ColorRect = $Color
 @onready var card_state_machine: CardStateMachine = $CardStateMachine as CardStateMachine
@@ -47,11 +48,15 @@ func show_card():
 		
 func card_clicked():
 	self.color.visible = false
-	var tween = create_tween()
+	self.card_visible = true
+	show_card()
+	var tween = create_tween().set_parallel(true)
 	var newPosition = self.get_parent().positionInTable
-	tween.tween_property(self, "global_position", newPosition , 0.5)
-	await tween.finished
 	var ui_layer := get_tree().get_first_node_in_group("table")
 	if ui_layer:
 		self.reparent(ui_layer)
+	tween.tween_property(self, "global_position", newPosition , 0.5).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "rotation", 0 , 0.5)
+	await tween.finished
+	self.card_played.emit()
 	

@@ -5,6 +5,10 @@ extends Node2D
 @onready var npcCard: PackedScene = preload("res://scenes/cardUi/card_ui_npc.tscn")
 
 enum NOTRUMPHHANDS {BALANCED, ONESEMIFAIL, UNBALANCED}
+signal player1_turn()
+signal player2_turn()
+signal player3_turn()
+signal player4_turn()
 
 var cards = ['314','114','214','414',
 			 '302','102','202','402',
@@ -19,8 +23,13 @@ var cards = ['314','114','214','414',
 			 '311','111','211','411',
 			 '312','112','212','412',
 			 '313','113','213','413']
+			
 var cards_instatiated = []
 var cardsGot = {}
+var symbolPreferred : int = 0
+var dealAmount : int
+var cards_played : int = 0
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	for i in cards.size():
@@ -32,6 +41,11 @@ func _ready():
 		new_card.value = value
 		new_card.symbol = symbol
 		cards_instatiated.append(new_card)
+	$Player1/Hand.turn_over.connect(_on_player_played)
+	$Player2/Hand.turn_over.connect(_on_player_played)
+	$Player3/Hand.turn_over.connect(_on_player_played)
+	$Player4/Hand.turn_over.connect(_on_player_played)
+	
 
 func get_card() -> String:
 	var choice = cards.pick_random()
@@ -60,19 +74,20 @@ func _on_button_pressed():
 				"""
 			2:
 				card.player = counter
-				$Player2/Hand.add_child(card)
+				$Player2/Hand.add_card(card)
 			3:
 				#card.card_visible = true
 				card.player = counter
 				$Player3/Hand.add_card(card)
 			4:
 				card.player = counter
-				$Player4/Hand.add_child(card)
+				$Player4/Hand.add_card(card)
 		counter %= 4
 	$Player1/Hand.reconnect_signals()
 	$Player3/Hand.reconnect_signals()
 	print($Player1/Hand.get_child_count(), "-", $Player3/Hand.get_child_count())
 	print($Player2/Hand.get_child_count(), "-", $Player4/Hand.get_child_count())
+	$Player1/Hand.start_turn()
 
 func _on_help_pressed():
 	pass # Replace with function body.
@@ -136,15 +151,15 @@ func notrumph_main_hand() -> void:
 				var one_more = randi() % 2 == 0
 				if not four_in_one and i == type_counter.size()-1:
 					one_more = true
-				var max = 3
-				if not one_more and type_counter[i] == max:
+				var max_amount = 3
+				if not one_more and type_counter[i] == max_amount:
 					continue
 				if four_in_one:
 					one_more = false
 				if not four_in_one and one_more:
-					max += 1
+					max_amount += 1
 					four_in_one = true
-				while type_counter[i] < max:
+				while type_counter[i] < max_amount:
 					var rand_value = randi_range(2, 10)
 					if cardsGot.has(((i + 1) * 100) + rand_value):
 						continue
@@ -195,3 +210,77 @@ func search_card(symbol : int, value : int, player : int) -> void:
 			4:
 				$Player4/Hand.add_card(cards_instatiated.pop_at(j))
 		break
+
+func _on_player_played(player_turn_ended : int) -> void:
+	var next_turn = player_turn_ended + 1
+	cards_played += 1
+	if next_turn > 4:
+		next_turn = 1
+	if cards_played == 4:
+		next_turn = await check_winner_of_round()
+		cards_played = 0
+	if $Rounds.get_child_count() == 13:
+		print("se acabo la partida")
+		return
+	match next_turn:
+		1:
+			player1_turn.emit()
+		2:
+			player2_turn.emit()
+		3:
+			player3_turn.emit()
+		4:
+			player4_turn.emit()
+
+func check_winner_of_round() -> int:
+	var tween = create_tween().set_parallel(true)
+	var table_layer := get_tree().get_first_node_in_group("table")
+	var winner : int = 0
+	var winner_symbol : int
+	var winner_value : int
+	var first = true
+	var direction = Vector2(0,0)
+	for child in table_layer.get_children():
+		var card_ui = child as CardUI
+		if first:
+			winner = card_ui.player
+			winner_symbol = card_ui.symbol
+			winner_value = card_ui.value
+			first = false
+		else:
+			match symbolPreferred:
+				0:
+					if winner_symbol != card_ui.symbol:
+						continue
+					else:
+						if winner_value < card_ui.value:
+							winner = card_ui.player
+							winner_symbol = card_ui.symbol
+							winner_value = card_ui.value
+				_:
+					if card_ui.symbol == symbolPreferred:
+						if winner_symbol != symbolPreferred or (winner_value < card_ui.value and winner_symbol == symbolPreferred):
+							winner = card_ui.player
+							winner_symbol = card_ui.symbol
+							winner_value = card_ui.value
+	var new_node : Node = Node.new()
+	match winner:
+		1:
+			direction = Vector2(640,800)
+			$Panel/WonCounter.text = str($Panel/WonCounter.text.to_int() + 1 )
+		2:
+			direction = Vector2(-100,360)
+			$Panel/LostCounter.text = str($Panel/LostCounter.text.to_int() + 1 )
+		3:
+			direction = Vector2(640,-200)
+			$Panel/WonCounter.text = str($Panel/WonCounter.text.to_int() + 1 )
+		4:
+			direction = Vector2(1380,360)
+			$Panel/LostCounter.text = str($Panel/LostCounter.text.to_int() + 1 )
+	for child in table_layer.get_children():
+		tween.tween_property(child, "global_position", direction , 0.5)
+	await tween.finished
+	for child in table_layer.get_children():
+		child.reparent(new_node)
+	$Rounds.add_child(new_node)
+	return winner

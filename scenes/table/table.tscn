@@ -2,12 +2,12 @@
 
 [ext_resource type="Script" path="res://scenes/table/table.gd" id="1_8si85"]
 [ext_resource type="Texture2D" uid="uid://dihasscgbbns5" path="res://Graphics/34379.jpg" id="1_ru0fu"]
-[ext_resource type="Script" path="res://scenes/ui/hand.gd" id="2_tv3uu"]
+[ext_resource type="PackedScene" uid="uid://b8scu1hn1isma" path="res://scenes/hand/hand.tscn" id="3_o8n2d"]
 [ext_resource type="Theme" uid="uid://g5w7cullef56" path="res://default.tres" id="4_x518n"]
 
 [sub_resource type="Theme" id="Theme_1srym"]
 
-[node name="Table" type="Node2D"]
+[node name="Table" type="Node2D" groups=["root"]]
 script = ExtResource("1_8si85")
 
 [node name="background" type="Sprite2D" parent="."]
@@ -21,63 +21,48 @@ metadata/_edit_lock_ = true
 
 [node name="Player1" type="CanvasLayer" parent="." groups=["ui_layer"]]
 
-[node name="Hand" type="HBoxContainer" parent="Player1"]
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -472.0
-offset_top = -220.0
-offset_right = 472.0
-offset_bottom = -95.0
-grow_horizontal = 2
-grow_vertical = 0
-alignment = 1
-script = ExtResource("2_tv3uu")
+[node name="Hand" parent="Player1" instance=ExtResource("3_o8n2d")]
 
 [node name="Player2" type="CanvasLayer" parent="."]
 
-[node name="Hand" type="HBoxContainer" parent="Player2"]
+[node name="Hand" parent="Player2" instance=ExtResource("3_o8n2d")]
 custom_minimum_size = Vector2(400, 0)
 anchors_preset = 4
+anchor_left = 0.0
 anchor_top = 0.5
+anchor_right = 0.0
 anchor_bottom = 0.5
-offset_top = -260.0
-offset_right = 540.0
-offset_bottom = -200.0
+offset_left = -1028.0
+offset_top = -25.0
+offset_right = -488.0
+offset_bottom = 35.0
+grow_horizontal = 1
 grow_vertical = 2
-rotation = 1.5708
-alignment = 1
-script = ExtResource("2_tv3uu")
 
 [node name="Player3" type="CanvasLayer" parent="." groups=["ui_layer2"]]
 
-[node name="Hand" type="HBoxContainer" parent="Player3"]
+[node name="Hand" parent="Player3" instance=ExtResource("3_o8n2d")]
 anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -472.0
-offset_right = 472.0
+anchor_top = 0.0
+anchor_bottom = 0.0
+offset_top = 0.0
 offset_bottom = 125.0
-grow_horizontal = 2
-alignment = 1
-script = ExtResource("2_tv3uu")
+grow_vertical = 1
 
 [node name="Player4" type="CanvasLayer" parent="."]
 
-[node name="Hand" type="HBoxContainer" parent="Player4"]
+[node name="Hand" parent="Player4" instance=ExtResource("3_o8n2d")]
 anchors_preset = 4
+anchor_left = 0.0
 anchor_top = 0.5
+anchor_right = 0.0
 anchor_bottom = 0.5
 offset_left = 1283.0
-offset_top = 260.0
+offset_top = -25.0
 offset_right = 1823.0
-offset_bottom = 320.0
+offset_bottom = 35.0
+grow_horizontal = 1
 grow_vertical = 2
-rotation = -1.5708
-alignment = 1
-script = ExtResource("2_tv3uu")
 
 [node name="Panel" type="Panel" parent="."]
 anchors_preset = 12
@@ -228,6 +213,8 @@ selecting_enabled = false
 deselect_on_focus_loss_enabled = false
 drag_and_drop_selection_enabled = false
 flat = true
+
+[node name="Rounds" type="Node" parent="."]
 
 [connection signal="pressed" from="Panel/DealRandom" to="." method="_on_deal_random_pressed"]
 [connection signal="pressed" from="Panel/DealNoTriumph" to="." method="_on_deal_no_triumph_pressed"]
