@@ -16,7 +16,6 @@ var symbol: int
 var default_card: String = "card back/cardBackBlue"
 var card_cover: String
 var card_visible: bool = false
-var tween: Tween
 
 func _ready() -> void:
 	card_state_machine.init(self)
@@ -51,8 +50,11 @@ func card_clicked():
 	self.color.visible = false
 	self.card_visible = true
 	show_card()
-	tween = create_tween()
-	var newPosition = self.get_parent().positionInTable
+	var tween: Tween = create_tween()
+	var parent : Hand = self.get_parent()
+	var newPosition = parent.positionInTable
+	if parent.playerInd == 2 or parent.playerInd == 4:
+		tween.tween_property(self, "global_position", parent.positionToMoveToTable , 0.1)
 	var ui_layer := get_tree().get_first_node_in_group("table")
 	if ui_layer:
 		self.reparent(ui_layer)

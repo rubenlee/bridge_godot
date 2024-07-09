@@ -30,7 +30,6 @@ var symbolPreferred : int = 0
 var dealAmount : int
 var cards_played : int = 0
 
-# Called when the node enters the scene tree for the first time.
 func _ready():
 	for i in cards.size():
 		var card : String = get_card()
@@ -121,34 +120,59 @@ func _on_deal_random_pressed():
 				$Player4/Hand.add_child(card)
 		counter %= 4
 	$Player1/Hand.reconnect_signals()
+	$Player2/Hand.reconnect_signals()
 	$Player3/Hand.reconnect_signals()
+	$Player4/Hand.reconnect_signals()
+	$Player1/Hand.start_turn()
 
+func get_amount_of_points(pointsToReach: int):
+	var point_dict = {}
+	var sum = 0
+	while true:
+		var rand_value = randi_range(11, 14)
+		if not point_dict.has(rand_value):
+			point_dict[rand_value] = 1
+		else:
+			if point_dict[rand_value] == 4:
+				continue
+			point_dict[rand_value] += 1
+		sum += rand_value % 10
+		var rest =  sum - pointsToReach
+		if rest == 0:
+			return point_dict
+		elif rest > 0:
+			if point_dict.has(rest + 10):
+				point_dict[rest + 10] -= 1
+				if point_dict[rest + 10] == 0:
+					point_dict.erase(rest + 10)
+				return point_dict
+			elif point_dict.has(rest + 11):
+				point_dict[rest + 11] -= 1
+				if point_dict[rest + 11] == 0:
+					point_dict.erase(rest + 11)
+				if point_dict.has(11):
+					if point_dict[11] != 4:
+						point_dict[11] += 11
+			return point_dict
+			
 func notrumph_main_hand() -> void:
 	#var type = NOTRUMPHHANDS.values().pick_random()
 	var type = NOTRUMPHHANDS.BALANCED
 	var main_hand_value = randi_range(15,17)
 	var type_counter = [0,0,0,0]
 	var acumulated_value = 0
+	var value_dict = get_amount_of_points(main_hand_value)
+	for value in value_dict:
+		for amount in value_dict[value]:
+			var rand_type = randi_range(1,4)
+			if cardsGot.has((rand_type * 100) + value):
+				continue
+			type_counter[rand_type - 1] += 1
+			search_card(rand_type, value, 1)
+			cardsGot[(rand_type * 100) + value] = 0
 	match type:
 		NOTRUMPHHANDS.BALANCED:
 			var four_in_one = false
-			while true:
-				var rand_type = randi_range(1,4)
-				var rand_value
-				if(main_hand_value == acumulated_value):
-					break
-				elif(main_hand_value - acumulated_value >= 5):
-					rand_value = randi_range(11, 14)
-				else:
-					rand_value = randi_range(11, 10 + (main_hand_value-acumulated_value))
-				if type_counter[rand_type - 1] > 3:
-					continue
-				if cardsGot.has((rand_type * 100) + rand_value):
-					continue
-				acumulated_value += rand_value % 10
-				type_counter[rand_type - 1] += 1
-				search_card(rand_type, rand_value, 1)
-				cardsGot[(rand_type * 100) + rand_value] = 0
 			for i in type_counter.size():
 				var one_more = randi() % 2 == 0
 				if not four_in_one and i == type_counter.size()-1:
@@ -271,13 +295,13 @@ func check_winner_of_round() -> int:
 			direction = Vector2(640,800)
 			$Panel/WonCounter.text = str($Panel/WonCounter.text.to_int() + 1 )
 		2:
-			direction = Vector2(-100,360)
+			direction = Vector2(-100,275)
 			$Panel/LostCounter.text = str($Panel/LostCounter.text.to_int() + 1 )
 		3:
 			direction = Vector2(640,-200)
 			$Panel/WonCounter.text = str($Panel/WonCounter.text.to_int() + 1 )
 		4:
-			direction = Vector2(1380,360)
+			direction = Vector2(1380,275)
 			$Panel/LostCounter.text = str($Panel/LostCounter.text.to_int() + 1 )
 	for child in table_layer.get_children():
 		tween.tween_property(child, "global_position", direction , 1)
