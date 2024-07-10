@@ -29,7 +29,6 @@ func _ready():
 			positionInTable = Vector2(680,230)	
 			positionToMoveToTable = Vector2(1380,275)
 			root.player4_turn.connect(start_turn)
-	#hand_state_machine.init()
 	for child in get_children():
 		if child is CardUI:
 			var card_ui := child as CardUI
@@ -69,7 +68,10 @@ func add_card(newCard : CardUI) -> void:
 	if not cards_dict.has(newCard.symbol):
 		cards_dict[newCard.symbol] = []
 	cards_dict[newCard.symbol].append(newCard.value)
-	self.add_child(newCard)
+	if newCard.get_parent() == null:
+		self.add_child(newCard)
+	else:
+		newCard.reparent(self)
 	self.move_child(newCard, position_in_hand)
 		
 func selectable_cards() -> void:
@@ -84,24 +86,38 @@ func selectable_cards() -> void:
 			continue
 		var card_ui = child as CardUI
 		if symbol_to_look == 0:
-			card_ui.color.visible = true
+			if playerInd != 3:
+				card_ui.color.visible = true
+			else:
+				card_ui.color_2.visible = true
 			symbol_found = true
 		elif symbol_to_look == card_ui.symbol:
-			card_ui.color.visible = true
+			if playerInd != 3:
+				card_ui.color.visible = true
+			else:
+				card_ui.color_2.visible = true
 			symbol_found = true
 	if not symbol_found:
 		for child in get_children():
 			if not child is CardUI:
 				continue
 			var card_ui = child as CardUI
-			card_ui.color.visible = true
+			if playerInd != 3:
+				card_ui.color.visible = true
+			else:
+				card_ui.color_2.visible = true
 
-func _on_card_played() -> void:
+func disable_visible_for_cards() -> void:
 	for child in get_children():
 		if not child is CardUI:
 			continue
 		var card_ui = child as CardUI
-		card_ui.color.visible = false
+		if playerInd != 3:
+			card_ui.color.visible = false
+		else:
+			card_ui.color_2.visible = false
+
+func _on_card_played() -> void:
 	turn_over.emit(playerInd)
 	
 func start_turn():
@@ -124,9 +140,8 @@ func no_trumph_thinking() -> void:
 	var cards_played = table_layer.get_child_count()
 	if cards_played > 0:
 		var first_card = table_layer.get_child(0) as CardUI
-		var array_values : Array = cards_dict[first_card.symbol]
 		symbol_used = first_card.symbol
-		if array_values.is_empty():
+		if not cards_dict.has(first_card.symbol):
 			value_used = 100
 			for symbol in cards_dict:
 				for value in cards_dict[symbol]:

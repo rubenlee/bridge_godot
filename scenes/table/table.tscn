@@ -83,6 +83,7 @@ anchor_right = 1.0
 offset_left = -216.0
 offset_bottom = 47.0
 grow_horizontal = 0
+focus_mode = 0
 text = "Repartir Aleatorio"
 
 [node name="DealNoTriumph" type="Button" parent="Panel"]
@@ -96,10 +97,12 @@ offset_left = -216.0
 offset_top = -46.0
 grow_horizontal = 0
 grow_vertical = 0
+focus_mode = 0
 theme = SubResource("Theme_1srym")
 text = "Repartir no triunfo"
 
 [node name="Help" type="Button" parent="Panel"]
+visible = false
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -112,6 +115,7 @@ offset_right = -215.0
 offset_bottom = -10.0
 grow_horizontal = 0
 grow_vertical = 0
+focus_mode = 0
 theme = ExtResource("4_x518n")
 text = "Ayuda"
 
@@ -214,8 +218,18 @@ deselect_on_focus_loss_enabled = false
 drag_and_drop_selection_enabled = false
 flat = true
 
+[node name="reset" type="Button" parent="Panel"]
+layout_mode = 0
+offset_left = 704.0
+offset_right = 851.0
+offset_bottom = 93.0
+focus_mode = 0
+theme = ExtResource("4_x518n")
+text = "Reset"
+
 [node name="Rounds" type="Node" parent="."]
 
 [connection signal="pressed" from="Panel/DealRandom" to="." method="_on_deal_random_pressed"]
 [connection signal="pressed" from="Panel/DealNoTriumph" to="." method="_on_deal_no_triumph_pressed"]
 [connection signal="pressed" from="Panel/Help" to="." method="_on_help_pressed"]
+[connection signal="pressed" from="Panel/reset" to="." method="_on_reset_pressed"]

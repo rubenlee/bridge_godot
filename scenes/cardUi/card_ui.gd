@@ -4,6 +4,7 @@ extends Control
 signal reparent_requested(which_card_ui: CardUI)
 signal card_played()
 
+@onready var color_2: ColorRect = $Color2
 @onready var color: ColorRect = $Color
 @onready var card_state_machine: CardStateMachine = $CardStateMachine as CardStateMachine
 @onready var drop_point_detector = $DropPointDetector
@@ -47,11 +48,11 @@ func show_card():
 		card_image.texture = load("res://Graphics/cards/" + default_card + ".png")
 		
 func card_clicked():
-	self.color.visible = false
+	var parent : Hand = self.get_parent()
+	parent.disable_visible_for_cards()
 	self.card_visible = true
 	show_card()
 	var tween: Tween = create_tween()
-	var parent : Hand = self.get_parent()
 	var newPosition = parent.positionInTable
 	if parent.playerInd == 2 or parent.playerInd == 4:
 		tween.tween_property(self, "global_position", parent.positionToMoveToTable , 0.1)
