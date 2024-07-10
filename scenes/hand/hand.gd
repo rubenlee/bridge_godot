@@ -140,8 +140,11 @@ func no_trumph_thinking() -> void:
 	var cards_played = table_layer.get_child_count()
 	if cards_played > 0:
 		var first_card = table_layer.get_child(0) as CardUI
+		var array_values : Array = []
+		if cards_dict.has(first_card.symbol):
+			array_values = cards_dict[first_card.symbol]
 		symbol_used = first_card.symbol
-		if not cards_dict.has(first_card.symbol):
+		if array_values.is_empty():
 			value_used = 100
 			for symbol in cards_dict:
 				for value in cards_dict[symbol]:

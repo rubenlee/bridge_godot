@@ -1,0 +1,107 @@
+[gd_scene load_steps=10 format=3 uid="uid://12o8dt47rkkg"]
+
+[ext_resource type="Script" path="res://scenes/main_menu.gd" id="1_77svq"]
+[ext_resource type="Texture2D" uid="uid://dihasscgbbns5" path="res://Graphics/34379.jpg" id="1_gf6i3"]
+[ext_resource type="Texture2D" uid="uid://dq40c8334uav0" path="res://Graphics/cards/111.png" id="3_5ghp0"]
+[ext_resource type="Texture2D" uid="uid://bin2sdoiqls8f" path="res://Graphics/cards/212.png" id="4_0r8yd"]
+[ext_resource type="Texture2D" uid="uid://b6dnlk6lk0d87" path="res://Graphics/cards/313.png" id="5_h1e40"]
+[ext_resource type="Texture2D" uid="uid://bbsmflpfvre40" path="res://Graphics/cards/414.png" id="6_m4hpp"]
+[ext_resource type="Theme" uid="uid://g5w7cullef56" path="res://default.tres" id="7_oilxq"]
+[ext_resource type="FontFile" uid="uid://tx8q8v6v1ns1" path="res://title_font.ttf" id="8_ydqj6"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_wtgtj"]
+font = ExtResource("8_ydqj6")
+font_size = 120
+shadow_size = 50
+shadow_color = Color(0, 0, 0, 0.262745)
+shadow_offset = Vector2(1, 0)
+
+[node name="main_menu" type="Node2D"]
+script = ExtResource("1_77svq")
+
+[node name="background" type="Sprite2D" parent="."]
+modulate = Color(0.362829, 0.362829, 0.362829, 1)
+scale = Vector2(0.855, 0.72)
+texture = ExtResource("1_gf6i3")
+centered = false
+metadata/_edit_lock_ = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+offset_left = 416.0
+offset_top = 430.0
+offset_right = 816.0
+offset_bottom = 644.0
+alignment = 1
+
+[node name="quick_game" type="Button" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 75)
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Partida Rápida"
+
+[node name="new_game" type="Button" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 75)
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Nueva Partida
+"
+
+[node name="quit" type="Button" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 75)
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Salir
+"
+
+[node name="Sprite2D" type="TextureRect" parent="."]
+offset_left = 194.0
+offset_top = 159.0
+offset_right = 611.0
+offset_bottom = 813.0
+rotation = -0.554409
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("3_5ghp0")
+
+[node name="Sprite2D2" type="TextureRect" parent="."]
+offset_left = 311.0
+offset_top = 95.0
+offset_right = 728.0
+offset_bottom = 749.0
+rotation = -0.127522
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("4_0r8yd")
+
+[node name="Sprite2D3" type="TextureRect" parent="."]
+offset_left = 433.0
+offset_top = 82.0
+offset_right = 850.0
+offset_bottom = 736.0
+rotation = 0.194584
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("5_h1e40")
+
+[node name="Sprite2D4" type="TextureRect" parent="."]
+offset_left = 553.0
+offset_top = 107.0
+offset_right = 970.0
+offset_bottom = 761.0
+rotation = 0.603416
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("6_m4hpp")
+
+[node name="TextEdit" type="Label" parent="."]
+offset_left = 652.0
+offset_top = 156.0
+offset_right = 1142.0
+offset_bottom = 382.0
+theme = ExtResource("7_oilxq")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(1, 1, 1, 0)
+theme_override_fonts/font = ExtResource("8_ydqj6")
+theme_override_font_sizes/font_size = 120
+text = "Bridge"
+label_settings = SubResource("LabelSettings_wtgtj")
+
+[connection signal="pressed" from="VBoxContainer/quick_game" to="." method="_on_quick_game_pressed"]
+[connection signal="pressed" from="VBoxContainer/new_game" to="." method="_on_quick_game_2_pressed"]
+[connection signal="pressed" from="VBoxContainer/quit" to="." method="_on_quit_pressed"]

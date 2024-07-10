@@ -323,6 +323,7 @@ func _on_player_played(player_turn_ended : int) -> void:
 	if $Rounds.get_child_count() == 13:
 		print("se acabo la partida")
 		return
+	print("siguiente turno ", next_turn)
 	match next_turn:
 		1:
 			player1_turn.emit()
