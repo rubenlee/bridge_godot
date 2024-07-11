@@ -4,7 +4,6 @@ extends HBoxContainer
 signal turn_over(whom_ended : int)
 @onready var positionInTable: Vector2
 @onready var positionToMoveToTable : Vector2
-#@onready var hand_state_machine: HandStateMachine = $HandStateMachine as HandStateMachine
 
 var cards_dict = {}
 var playerInd : int

@@ -1,0 +1,40 @@
+[gd_scene load_steps=2 format=3 uid="uid://cc7bgmsip3wev"]
+
+[ext_resource type="Texture2D" uid="uid://dihasscgbbns5" path="res://Graphics/34379.jpg" id="1_gmxoc"]
+
+[node name="configurationDeal" type="Node2D"]
+
+[node name="background" type="TextureRect" parent="."]
+modulate = Color(0.362829, 0.362829, 0.362829, 1)
+scale = Vector2(0.855, 0.72)
+texture = ExtResource("1_gmxoc")
+metadata/_edit_lock_ = true
+
+[node name="TabContainer" type="TabContainer" parent="."]
+offset_left = 77.0
+offset_top = 185.0
+offset_right = 779.0
+offset_bottom = 660.0
+
+[node name="No Triunfo" type="TabBar" parent="TabContainer"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="TabContainer/No Triunfo"]
+layout_mode = 0
+offset_left = 175.0
+offset_top = 106.0
+offset_right = 216.0
+offset_bottom = 137.0
+text = "Test"
+
+[node name="Palo Menor" type="TabBar" parent="TabContainer"]
+visible = false
+layout_mode = 2
+
+[node name="Palo Mayor" type="TabBar" parent="TabContainer"]
+visible = false
+layout_mode = 2
+
+[node name="Monocolor" type="TabBar" parent="TabContainer"]
+visible = false
+layout_mode = 2

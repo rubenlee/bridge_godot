@@ -2,7 +2,6 @@ class_name Table
 extends Node2D
 
 @onready var normalCard: PackedScene = preload("res://scenes/cardUi/card_ui.tscn")
-@onready var npcCard: PackedScene = preload("res://scenes/cardUi/card_ui_npc.tscn")
 
 enum NOTRUMPHHANDS {BALANCED, ONESEMIFAIL, UNBALANCED}
 signal player1_turn()
@@ -58,7 +57,7 @@ func get_card_instatiated() -> CardUI:
 	cards_instatiated.remove_at(x)
 	return choice
 
-func _on_button_pressed():
+func fill_rest_hands():
 	var counter :int = 0
 	for i in cards_instatiated.size():
 		var card : CardUI = get_card_instatiated()
@@ -96,7 +95,7 @@ func _on_deal_no_triumph_pressed():
 	$Panel/DealNoTriumph.disabled = true
 	notrumph_main_hand()
 	notrumph_off_hand()
-	_on_button_pressed()
+	fill_rest_hands()
 
 func _on_deal_random_pressed():
 	$Panel/DealRandom.disabled = true
@@ -389,5 +388,3 @@ func check_winner_of_round() -> int:
 
 func _on_reset_pressed():
 	get_tree().reload_current_scene()
-	await self.ready
-	_on_deal_no_triumph_pressed()
