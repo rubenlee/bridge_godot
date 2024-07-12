@@ -43,7 +43,27 @@ func _ready():
 	$Player2/Hand.turn_over.connect(_on_player_played)
 	$Player3/Hand.turn_over.connect(_on_player_played)
 	$Player4/Hand.turn_over.connect(_on_player_played)
-	
+	$bidding.biddings_over.connect(_on_bidding_over)
+	$Player3/Hand.mouse_filter = $Player3/Hand.MOUSE_FILTER_IGNORE
+	_on_deal_no_triumph_pressed()
+
+func _on_bidding_over(player_won_bid : int, symbol : int, deal_amount : int):
+	$Player3/Hand.mouse_filter = $Player3/Hand.MOUSE_FILTER_PASS
+	for child in $Player3/Hand.get_children():
+		child.visible = true
+	deal_amount = deal_amount 
+	symbolPreferred = symbol
+	var player_start = (player_won_bid + 1) % 4
+	print(player_start)
+	match player_start:
+		1:
+			$Player1/Hand.start_turn()
+		2:
+			$Player2/Hand.start_turn()
+		3:
+			$Player3/Hand.start_turn()
+		0:
+			$Player4/Hand.start_turn()
 
 func get_card() -> String:
 	var choice = cards.pick_random()
@@ -85,7 +105,6 @@ func fill_rest_hands():
 	$Player2/Hand.reconnect_signals()
 	$Player3/Hand.reconnect_signals()
 	$Player4/Hand.reconnect_signals()
-	$Player1/Hand.start_turn()
 
 func _on_help_pressed():
 	pass # Replace with function body.
@@ -306,6 +325,7 @@ func search_card(symbol : int, value : int, player : int) -> void:
 			2:
 				$Player2/Hand.add_card(cards_instatiated.pop_at(j))
 			3:
+				cards_instatiated[j].visible = false
 				$Player3/Hand.add_card(cards_instatiated.pop_at(j))
 			4:
 				$Player4/Hand.add_card(cards_instatiated.pop_at(j))

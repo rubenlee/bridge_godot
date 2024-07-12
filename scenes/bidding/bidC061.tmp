@@ -1,0 +1,303 @@
+[gd_scene load_steps=3 format=3 uid="uid://q3vx4alcf1x8"]
+
+[ext_resource type="Theme" uid="uid://g5w7cullef56" path="res://default.tres" id="1_1vtek"]
+[ext_resource type="Script" path="res://scenes/bidding/bidding.gd" id="1_73vrw"]
+
+[node name="bidding" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_73vrw")
+
+[node name="bid_grid" type="GridContainer" parent="."]
+layout_mode = 0
+offset_left = 237.0
+offset_top = 85.0
+offset_right = 528.0
+offset_bottom = 449.0
+columns = 5
+
+[node name="Button" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "1NT"
+
+[node name="Button2" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "1♧"
+
+[node name="Button3" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "1♦"
+
+[node name="Button4" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "1♥"
+
+[node name="Button5" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "1♤"
+
+[node name="Button6" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "2NT"
+
+[node name="Button7" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "2♧"
+
+[node name="Button8" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "2♦"
+
+[node name="Button9" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "2♥"
+
+[node name="Button10" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "2♤"
+
+[node name="Button11" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "3NT"
+
+[node name="Button12" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "3♧"
+
+[node name="Button13" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "3♦"
+
+[node name="Button14" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "3♥"
+
+[node name="Button15" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "3♤"
+
+[node name="Button16" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "4NT"
+
+[node name="Button17" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "4♧"
+
+[node name="Button18" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "4♦"
+
+[node name="Button19" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "4♥"
+
+[node name="Button20" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "4♤"
+
+[node name="Button21" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "5NT"
+
+[node name="Button22" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "5♧"
+
+[node name="Button23" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "5♦"
+
+[node name="Button24" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "5♥"
+
+[node name="Button25" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "5♤"
+
+[node name="Button26" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "6NT"
+
+[node name="Button27" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "6♧"
+
+[node name="Button28" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "6♦"
+
+[node name="Button29" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "6♥"
+
+[node name="Button30" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "6♤"
+
+[node name="Button31" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "7NT"
+
+[node name="Button32" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "7♧"
+
+[node name="Button33" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "7♦"
+
+[node name="Button34" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "7♥"
+
+[node name="Button35" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "7♤"
+
+[node name="bid_rest" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 237.0
+offset_top = 406.0
+offset_right = 522.0
+offset_bottom = 448.0
+
+[node name="Button36" type="Button" parent="bid_rest"]
+custom_minimum_size = Vector2(175, 0)
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "PASAR"
+
+[node name="Button37" type="Button" parent="bid_rest"]
+custom_minimum_size = Vector2(51, 0)
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "X"
+
+[node name="Button38" type="Button" parent="bid_rest"]
+custom_minimum_size = Vector2(51, 0)
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "XX"
+
+[node name="bid_result_grid" type="GridContainer" parent="."]
+layout_mode = 0
+offset_left = 647.0
+offset_top = 85.0
+offset_right = 1142.0
+offset_bottom = 448.0
+theme_override_constants/h_separation = 5
+theme_override_constants/v_separation = 5
+columns = 4
+
+[node name="Label" type="Label" parent="bid_result_grid"]
+custom_minimum_size = Vector2(120, 50)
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+theme_override_font_sizes/font_size = 32
+text = "NORTE"
+horizontal_alignment = 1
+
+[node name="Label2" type="Label" parent="bid_result_grid"]
+custom_minimum_size = Vector2(120, 50)
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+theme_override_font_sizes/font_size = 32
+text = "ESTE"
+horizontal_alignment = 1
+
+[node name="Label3" type="Label" parent="bid_result_grid"]
+custom_minimum_size = Vector2(120, 50)
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+theme_override_font_sizes/font_size = 32
+text = "SUR"
+horizontal_alignment = 1
+
+[node name="Label4" type="Label" parent="bid_result_grid"]
+custom_minimum_size = Vector2(120, 50)
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+theme_override_font_sizes/font_size = 32
+text = "OESTE"
+horizontal_alignment = 1
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 772.0
+offset_top = 85.0
+offset_right = 775.0
+offset_bottom = 448.0
+color = Color(0, 0, 0, 1)
+
+[node name="ColorRect2" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 892.0
+offset_top = 85.0
+offset_right = 895.0
+offset_bottom = 448.0
+color = Color(0, 0, 0, 1)
+
+[node name="ColorRect3" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 1017.0
+offset_top = 85.0
+offset_right = 1020.0
+offset_bottom = 448.0
+color = Color(0, 0, 0, 1)
+
+[node name="ColorRect4" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 1142.0
+offset_top = 85.0
+offset_right = 1145.0
+offset_bottom = 448.0
+color = Color(0, 0, 0, 1)
+
+[node name="ColorRect5" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 647.0
+offset_top = 85.0
+offset_right = 650.0
+offset_bottom = 448.0
+color = Color(0, 0, 0, 1)

@@ -1,0 +1,371 @@
+[gd_scene load_steps=6 format=3 uid="uid://cc7bgmsip3wev"]
+
+[ext_resource type="Texture2D" uid="uid://dihasscgbbns5" path="res://Graphics/34379.jpg" id="1_gmxoc"]
+[ext_resource type="Script" path="res://scenes/ui/configuration_deal.gd" id="1_jsid4"]
+[ext_resource type="Theme" uid="uid://g5w7cullef56" path="res://default.tres" id="2_81y6k"]
+[ext_resource type="FontFile" uid="uid://tx8q8v6v1ns1" path="res://title_font.ttf" id="3_02qeq"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slm2e"]
+bg_color = Color(0, 0, 0, 1)
+draw_center = false
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 4
+border_color = Color(0, 0, 0, 1)
+
+[node name="configurationDeal" type="Node2D"]
+script = ExtResource("1_jsid4")
+
+[node name="background" type="TextureRect" parent="."]
+modulate = Color(0.540991, 0.54099, 0.54099, 1)
+scale = Vector2(0.855, 0.72)
+texture = ExtResource("1_gmxoc")
+metadata/_edit_lock_ = true
+
+[node name="Label" type="Label" parent="."]
+offset_left = 761.0
+offset_top = 141.0
+offset_right = 958.0
+offset_bottom = 175.0
+theme = ExtResource("2_81y6k")
+text = "Resumen"
+
+[node name="Label2" type="Label" parent="."]
+offset_left = 54.0
+offset_top = 23.0
+offset_right = 536.0
+offset_bottom = 104.0
+theme = ExtResource("2_81y6k")
+theme_override_fonts/font = ExtResource("3_02qeq")
+theme_override_font_sizes/font_size = 48
+text = "Creación de manos: (No funcional)"
+
+[node name="PanelContainer" type="VBoxContainer" parent="."]
+offset_left = 88.0
+offset_top = 125.0
+offset_right = 530.0
+offset_bottom = 519.0
+theme = ExtResource("2_81y6k")
+
+[node name="HBoxContainer5" type="HBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="PanelContainer/HBoxContainer5"]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "Repartidor:"
+
+[node name="OptionButton2" type="OptionButton" parent="PanelContainer/HBoxContainer5"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_vertical = 4
+item_count = 5
+selected = 0
+popup/item_0/text = "Aleatorio"
+popup/item_0/id = 0
+popup/item_1/text = "Norte"
+popup/item_1/id = 1
+popup/item_2/text = "Este"
+popup/item_2/id = 2
+popup/item_3/text = "Oeste"
+popup/item_3/id = 3
+popup/item_4/text = "Sur(jugador)"
+popup/item_4/id = 4
+
+[node name="HBoxContainer4" type="HBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="PanelContainer/HBoxContainer4"]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "Manos Afectadas:"
+
+[node name="OptionButton2" type="OptionButton" parent="PanelContainer/HBoxContainer4"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_vertical = 4
+item_count = 2
+selected = 0
+popup/item_0/text = "Norte-Sur"
+popup/item_0/id = 0
+popup/item_1/text = "Este-Oeste"
+popup/item_1/id = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="PanelContainer/HBoxContainer"]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "Posibles manos:"
+
+[node name="OptionButton2" type="OptionButton" parent="PanelContainer/HBoxContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_vertical = 4
+item_count = 4
+popup/item_0/text = "No Triunfo"
+popup/item_0/id = 0
+popup/item_1/text = "Palo bajo"
+popup/item_1/id = 1
+popup/item_2/text = "Palo Alto"
+popup/item_2/id = 2
+popup/item_3/text = "Monocolor"
+popup/item_3/id = 3
+
+[node name="Mano" type="Label" parent="PanelContainer"]
+layout_mode = 2
+text = "Norte"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/HBoxContainer2"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="PanelContainer/HBoxContainer2/VBoxContainer"]
+custom_minimum_size = Vector2(275, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "Puntos de honor:"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/HBoxContainer2/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="PanelContainer/HBoxContainer2/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "De: "
+
+[node name="value" type="SpinBox" parent="PanelContainer/HBoxContainer2/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="Label4" type="Label" parent="PanelContainer/HBoxContainer2/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "Hasta"
+
+[node name="value2" type="SpinBox" parent="PanelContainer/HBoxContainer2/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="distributionPoint" type="HBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="PanelContainer/distributionPoint"]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="PanelContainer/distributionPoint/VBoxContainer2"]
+custom_minimum_size = Vector2(275, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme = ExtResource("2_81y6k")
+text = "Puntos de distribucion:"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/distributionPoint/VBoxContainer2"]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="PanelContainer/distributionPoint/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "De: "
+
+[node name="value" type="SpinBox" parent="PanelContainer/distributionPoint/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="Label4" type="Label" parent="PanelContainer/distributionPoint/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "Hasta"
+
+[node name="value2" type="SpinBox" parent="PanelContainer/distributionPoint/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="Mano2" type="Label" parent="PanelContainer"]
+layout_mode = 2
+theme = ExtResource("2_81y6k")
+text = "Sur"
+
+[node name="honorPoint" type="HBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="PanelContainer/honorPoint"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="PanelContainer/honorPoint/VBoxContainer2"]
+custom_minimum_size = Vector2(275, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "Puntos de honor:"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/honorPoint/VBoxContainer2"]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="PanelContainer/honorPoint/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "De: "
+
+[node name="value" type="SpinBox" parent="PanelContainer/honorPoint/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="Label4" type="Label" parent="PanelContainer/honorPoint/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "Hasta"
+
+[node name="value2" type="SpinBox" parent="PanelContainer/honorPoint/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="distributionPoint2" type="HBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="PanelContainer/distributionPoint2"]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="PanelContainer/distributionPoint2/VBoxContainer2"]
+custom_minimum_size = Vector2(275, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme = ExtResource("2_81y6k")
+text = "Puntos de distribucion:"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/distributionPoint2/VBoxContainer2"]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="PanelContainer/distributionPoint2/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "De: "
+
+[node name="value" type="SpinBox" parent="PanelContainer/distributionPoint2/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="Label4" type="Label" parent="PanelContainer/distributionPoint2/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "Hasta"
+
+[node name="value2" type="SpinBox" parent="PanelContainer/distributionPoint2/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="add" type="Button" parent="."]
+offset_left = 552.0
+offset_top = 335.0
+offset_right = 696.0
+offset_bottom = 450.0
+theme = ExtResource("2_81y6k")
+text = "Añadir 
+mano"
+
+[node name="import" type="Button" parent="."]
+visible = false
+offset_left = 694.0
+offset_top = 550.0
+offset_right = 890.0
+offset_bottom = 625.0
+theme = ExtResource("2_81y6k")
+text = "Importar"
+
+[node name="export" type="Button" parent="."]
+visible = false
+offset_left = 947.0
+offset_top = 550.0
+offset_right = 1143.0
+offset_bottom = 625.0
+theme = ExtResource("2_81y6k")
+text = "Exportar"
+
+[node name="start" type="Button" parent="."]
+offset_left = 756.0
+offset_top = 629.0
+offset_right = 1194.0
+offset_bottom = 701.0
+theme = ExtResource("2_81y6k")
+text = "Empezar
+"
+
+[node name="return" type="Button" parent="."]
+offset_left = 1060.0
+offset_top = 41.0
+offset_right = 1184.0
+offset_bottom = 124.0
+theme = ExtResource("2_81y6k")
+text = "Volver al
+Menu Principal"
+
+[node name="ColorRect" type="Panel" parent="."]
+custom_minimum_size = Vector2(100, 100)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 761.0
+offset_top = 175.0
+offset_right = 1161.0
+offset_bottom = 541.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_81y6k")
+theme_override_styles/panel = SubResource("StyleBoxFlat_slm2e")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+offset_left = 766.0
+offset_top = 178.0
+offset_right = 1158.0
+offset_bottom = 538.0
+theme = ExtResource("2_81y6k")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+offset_left = 860.0
+offset_top = 550.0
+offset_right = 1161.0
+offset_bottom = 592.0
+
+[node name="eraseHand" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+theme = ExtResource("2_81y6k")
+text = "Eliminar mano"
+
+[node name="eraseHandOption" type="OptionButton" parent="HBoxContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+theme = ExtResource("2_81y6k")
+
+[connection signal="item_selected" from="PanelContainer/HBoxContainer4/OptionButton2" to="." method="_on_option_button_2_item_selected"]
+[connection signal="item_selected" from="PanelContainer/HBoxContainer/OptionButton2" to="." method="_on_deal_selected"]
+[connection signal="pressed" from="add" to="." method="_on_add_pressed"]
+[connection signal="pressed" from="import" to="." method="_on_import_pressed"]
+[connection signal="pressed" from="export" to="." method="_on_export_pressed"]
+[connection signal="pressed" from="start" to="." method="_on_start_pressed"]
+[connection signal="pressed" from="return" to="." method="_on_return_pressed"]
+[connection signal="pressed" from="HBoxContainer/eraseHand" to="." method="_on_erase_hand_pressed"]

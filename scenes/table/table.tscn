@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://babejfykmmvf"]
+[gd_scene load_steps=7 format=3 uid="uid://bmqt4qrrghudt"]
 
 [ext_resource type="Script" path="res://scenes/table/table.gd" id="1_8si85"]
 [ext_resource type="Texture2D" uid="uid://dihasscgbbns5" path="res://Graphics/34379.jpg" id="1_ru0fu"]
 [ext_resource type="PackedScene" uid="uid://b8scu1hn1isma" path="res://scenes/hand/hand.tscn" id="3_o8n2d"]
 [ext_resource type="Theme" uid="uid://g5w7cullef56" path="res://default.tres" id="4_x518n"]
+[ext_resource type="PackedScene" uid="uid://q3vx4alcf1x8" path="res://scenes/bidding/bidding.tscn" id="5_cca3w"]
 
 [sub_resource type="Theme" id="Theme_1srym"]
 
@@ -11,10 +12,12 @@
 script = ExtResource("1_8si85")
 
 [node name="background" type="TextureRect" parent="."]
-modulate = Color(0.362829, 0.362829, 0.362829, 1)
+modulate = Color(0.541176, 0.541176, 0.541176, 1)
 scale = Vector2(0.855, 0.72)
 texture = ExtResource("1_ru0fu")
 metadata/_edit_lock_ = true
+
+[node name="bidding" parent="." instance=ExtResource("5_cca3w")]
 
 [node name="TableCards" type="CanvasLayer" parent="." groups=["table"]]
 
@@ -75,6 +78,7 @@ grow_horizontal = 2
 grow_vertical = 0
 
 [node name="DealRandom" type="Button" parent="Panel"]
+visible = false
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
@@ -86,6 +90,7 @@ focus_mode = 0
 text = "Repartir Aleatorio"
 
 [node name="DealNoTriumph" type="Button" parent="Panel"]
+visible = false
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -218,6 +223,7 @@ drag_and_drop_selection_enabled = false
 flat = true
 
 [node name="reset" type="Button" parent="Panel"]
+visible = false
 layout_mode = 0
 offset_left = 704.0
 offset_right = 851.0
