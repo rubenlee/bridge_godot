@@ -24,11 +24,6 @@ offset_right = 528.0
 offset_bottom = 449.0
 columns = 5
 
-[node name="1NT" type="Button" parent="bid_grid"]
-layout_mode = 2
-theme = ExtResource("1_1vtek")
-text = "1NT"
-
 [node name="1C" type="Button" parent="bid_grid"]
 custom_minimum_size = Vector2(51, 0)
 layout_mode = 2
@@ -61,10 +56,10 @@ text = "1"
 icon = ExtResource("6_6qrd3")
 expand_icon = true
 
-[node name="2NT" type="Button" parent="bid_grid"]
+[node name="1NT" type="Button" parent="bid_grid"]
 layout_mode = 2
 theme = ExtResource("1_1vtek")
-text = "2NT"
+text = "1NT"
 
 [node name="2C" type="Button" parent="bid_grid"]
 layout_mode = 2
@@ -94,10 +89,10 @@ text = "2"
 icon = ExtResource("6_6qrd3")
 expand_icon = true
 
-[node name="3NT" type="Button" parent="bid_grid"]
+[node name="2NT" type="Button" parent="bid_grid"]
 layout_mode = 2
 theme = ExtResource("1_1vtek")
-text = "3NT"
+text = "2NT"
 
 [node name="3C" type="Button" parent="bid_grid"]
 layout_mode = 2
@@ -127,10 +122,10 @@ text = "3"
 icon = ExtResource("6_6qrd3")
 expand_icon = true
 
-[node name="4NT" type="Button" parent="bid_grid"]
+[node name="3NT" type="Button" parent="bid_grid"]
 layout_mode = 2
 theme = ExtResource("1_1vtek")
-text = "4NT"
+text = "3NT"
 
 [node name="4C" type="Button" parent="bid_grid"]
 layout_mode = 2
@@ -160,10 +155,10 @@ text = "4"
 icon = ExtResource("6_6qrd3")
 expand_icon = true
 
-[node name="5NT" type="Button" parent="bid_grid"]
+[node name="4NT" type="Button" parent="bid_grid"]
 layout_mode = 2
 theme = ExtResource("1_1vtek")
-text = "5NT"
+text = "4NT"
 
 [node name="5C" type="Button" parent="bid_grid"]
 layout_mode = 2
@@ -193,10 +188,10 @@ text = "5"
 icon = ExtResource("6_6qrd3")
 expand_icon = true
 
-[node name="6NT" type="Button" parent="bid_grid"]
+[node name="5NT" type="Button" parent="bid_grid"]
 layout_mode = 2
 theme = ExtResource("1_1vtek")
-text = "6NT"
+text = "5NT"
 
 [node name="6C" type="Button" parent="bid_grid"]
 layout_mode = 2
@@ -226,10 +221,10 @@ text = "6"
 icon = ExtResource("6_6qrd3")
 expand_icon = true
 
-[node name="7NT" type="Button" parent="bid_grid"]
+[node name="6NT" type="Button" parent="bid_grid"]
 layout_mode = 2
 theme = ExtResource("1_1vtek")
-text = "7NT"
+text = "6NT"
 
 [node name="7C" type="Button" parent="bid_grid"]
 layout_mode = 2
@@ -259,6 +254,11 @@ text = "7"
 icon = ExtResource("6_6qrd3")
 expand_icon = true
 
+[node name="7NT" type="Button" parent="bid_grid"]
+layout_mode = 2
+theme = ExtResource("1_1vtek")
+text = "7NT"
+
 [node name="bid_rest" type="HBoxContainer" parent="."]
 layout_mode = 0
 offset_left = 237.0
@@ -273,12 +273,14 @@ theme = ExtResource("1_1vtek")
 text = "PASAR"
 
 [node name="Button37" type="Button" parent="bid_rest"]
+visible = false
 custom_minimum_size = Vector2(51, 0)
 layout_mode = 2
 theme = ExtResource("1_1vtek")
 text = "X"
 
 [node name="Button38" type="Button" parent="bid_rest"]
+visible = false
 custom_minimum_size = Vector2(51, 0)
 layout_mode = 2
 theme = ExtResource("1_1vtek")
