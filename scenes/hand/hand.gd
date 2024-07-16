@@ -2,6 +2,7 @@ class_name Hand
 extends HBoxContainer
 
 signal turn_over(whom_ended : int)
+signal bidding_over(whom_ended : int, bid_dealt : String)
 @onready var positionInTable: Vector2
 @onready var positionToMoveToTable : Vector2
 
@@ -12,8 +13,19 @@ var honor_points: int = 0
 
 func _ready():
 	var parentName : String = self.get_parent().name
-	playerInd = parentName.substr(parentName.length() - 1).to_int()
+	for child in get_children():
+		if child is CardUI:
+			var card_ui := child as CardUI
+			card_ui.reparent_requested.connect(_on_card_ui_reparent_requested)
+			card_ui.card_played.connect(_on_card_played)
+	
+func _on_card_ui_reparent_requested(child: CardUI) -> void:
+	child.reparent(self)
+
+func setPlayerInd(player : int):
+	self.playerInd = player
 	var root := get_tree().get_first_node_in_group("root") as Table
+	var parentName : String = self.get_parent().name
 	match playerInd:
 		1:
 			positionInTable = Vector2(600,300)
@@ -29,15 +41,7 @@ func _ready():
 			positionInTable = Vector2(680,230)	
 			positionToMoveToTable = Vector2(1380,275)
 			root.player4_turn.connect(start_turn)
-	for child in get_children():
-		if child is CardUI:
-			var card_ui := child as CardUI
-			card_ui.reparent_requested.connect(_on_card_ui_reparent_requested)
-			card_ui.card_played.connect(_on_card_played)
-	
-func _on_card_ui_reparent_requested(child: CardUI) -> void:
-	child.reparent(self)
-	
+
 func reconnect_signals() -> void:
 	for child in get_children():
 		if not child is CardUI:
@@ -73,7 +77,7 @@ func add_card(newCard : CardUI) -> void:
 	else:
 		newCard.reparent(self)
 	if newCard.value > 10:
-		honor_points += newCard - 10
+		honor_points += newCard.value - 10
 	self.move_child(newCard, position_in_hand)
 		
 func selectable_cards() -> void:
@@ -126,25 +130,33 @@ func start_turn():
 	var child = self.get_child(0) as CardUI
 	var npc_controlled = false
 	var root := get_tree().get_first_node_in_group("root") as Table
-	if child.card_visible:
+	if not child.card_visible:
 		npc_controlled = true
-		
 	if not npc_controlled:
 		if not root.bidding_state:
 			selectable_cards()
 	else:
 		match root.symbolPreferred:
-			0:
+			5:
 				no_trumph_thinking()
 			_:
 				child.card_clicked()
 
-func bidding_thinking():
-	if honor_points < 12:
-		return "PASS"
+func bidding_thinking(bid_value : int, symbol_value : int, player_voted : int) -> void:
+	var bid_result = "pass"
+	var par = player_voted % 2
+	if bid_value == 0:
+		if honor_points >= 15 and honor_points <= 17:
+			bid_result = "1NT"
 	else:
-		pass
-	
+		if bid_value == 1:
+			if symbol_value == 5 and par == playerInd % 2:
+				if honor_points > 9:
+					bid_result = "3NT"
+				elif honor_points > 7:
+					bid_result = "2NT"
+	bidding_over.emit(playerInd, bid_result)	
+
 func no_trumph_thinking() -> void:
 	var table_layer := get_tree().get_first_node_in_group("table")
 	var symbol_used : int

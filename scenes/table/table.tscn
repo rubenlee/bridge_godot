@@ -1,13 +1,48 @@
-[gd_scene load_steps=8 format=3 uid="uid://bmqt4qrrghudt"]
+[gd_scene load_steps=10 format=3 uid="uid://bmqt4qrrghudt"]
 
 [ext_resource type="Script" path="res://scenes/table/table.gd" id="1_8si85"]
 [ext_resource type="Texture2D" uid="uid://dihasscgbbns5" path="res://Graphics/34379.jpg" id="1_ru0fu"]
 [ext_resource type="PackedScene" uid="uid://b8scu1hn1isma" path="res://scenes/hand/hand.tscn" id="3_o8n2d"]
 [ext_resource type="Theme" uid="uid://g5w7cullef56" path="res://default.tres" id="4_x518n"]
 [ext_resource type="PackedScene" uid="uid://q3vx4alcf1x8" path="res://scenes/bidding/bidding.tscn" id="5_cca3w"]
-[ext_resource type="Script" path="res://scenes/table/algorithmStateMachine.gd" id="6_yqq0v"]
 
 [sub_resource type="Theme" id="Theme_1srym"]
+
+[sub_resource type="Animation" id="Animation_oul6w"]
+resource_name = "simple_pop_up"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1.10957),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_7wb01"]
+resource_name = "simple_pop_up_disappear"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.7),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_tdvj5"]
+_data = {
+"simple_pop_up": SubResource("Animation_oul6w"),
+"simple_pop_up_disappear": SubResource("Animation_7wb01")
+}
 
 [node name="Table" type="Node2D" groups=["root"]]
 script = ExtResource("1_8si85")
@@ -26,9 +61,9 @@ metadata/_edit_lock_ = true
 
 [node name="Hand" parent="Player1" instance=ExtResource("3_o8n2d")]
 
-[node name="Player2" type="CanvasLayer" parent="."]
+[node name="Oeste" type="CanvasLayer" parent="."]
 
-[node name="Hand" parent="Player2" instance=ExtResource("3_o8n2d")]
+[node name="Hand" parent="Oeste" instance=ExtResource("3_o8n2d")]
 custom_minimum_size = Vector2(400, 0)
 anchors_preset = 4
 anchor_left = 0.0
@@ -42,9 +77,9 @@ offset_bottom = 35.0
 grow_horizontal = 1
 grow_vertical = 2
 
-[node name="Player3" type="CanvasLayer" parent="." groups=["ui_layer2"]]
+[node name="Norte" type="CanvasLayer" parent="." groups=["ui_layer2"]]
 
-[node name="Hand" parent="Player3" instance=ExtResource("3_o8n2d")]
+[node name="Hand" parent="Norte" instance=ExtResource("3_o8n2d")]
 anchors_preset = 5
 anchor_top = 0.0
 anchor_bottom = 0.0
@@ -52,9 +87,9 @@ offset_top = 0.0
 offset_bottom = 125.0
 grow_vertical = 1
 
-[node name="Player4" type="CanvasLayer" parent="."]
+[node name="Este" type="CanvasLayer" parent="."]
 
-[node name="Hand" parent="Player4" instance=ExtResource("3_o8n2d")]
+[node name="Hand" parent="Este" instance=ExtResource("3_o8n2d")]
 anchors_preset = 4
 anchor_left = 0.0
 anchor_top = 0.5
@@ -212,7 +247,6 @@ grow_horizontal = 2
 grow_vertical = 0
 theme = ExtResource("4_x518n")
 theme_override_colors/font_uneditable_color = Color(1, 1, 1, 1)
-text = "No Triunfo"
 editable = false
 context_menu_enabled = false
 virtual_keyboard_enabled = false
@@ -224,21 +258,77 @@ drag_and_drop_selection_enabled = false
 flat = true
 
 [node name="reset" type="Button" parent="Panel"]
-visible = false
 layout_mode = 0
-offset_left = 704.0
-offset_right = 851.0
+offset_left = 984.0
+offset_right = 1131.0
 offset_bottom = 93.0
 focus_mode = 0
 theme = ExtResource("4_x518n")
-text = "Reset"
+text = "Reiniciar
+manos"
+
+[node name="return" type="Button" parent="Panel"]
+layout_mode = 0
+offset_left = 1133.0
+offset_right = 1280.0
+offset_bottom = 93.0
+focus_mode = 0
+theme = ExtResource("4_x518n")
+text = "Volver"
 
 [node name="Rounds" type="Node" parent="."]
 
-[node name="algorithmStateMachine" type="Node" parent="."]
-script = ExtResource("6_yqq0v")
+[node name="Panel2" type="Panel" parent="."]
+self_modulate = Color(0, 0, 0, 1)
+offset_left = 441.0
+offset_top = 219.0
+offset_right = 841.0
+offset_bottom = 419.0
+scale = Vector2(1e-05, 1e-05)
+pivot_offset = Vector2(200, 100)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel2/VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="Panel2/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme = ExtResource("4_x518n")
+text = "Jugando apuesta: "
+
+[node name="Label2" type="Label" parent="Panel2/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme = ExtResource("4_x518n")
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Panel2/VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="Panel2/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+theme = ExtResource("4_x518n")
+text = "Empieza: "
+
+[node name="Label2" type="Label" parent="Panel2/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+theme = ExtResource("4_x518n")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Panel2"]
+libraries = {
+"": SubResource("AnimationLibrary_tdvj5")
+}
 
 [connection signal="pressed" from="Panel/DealRandom" to="." method="_on_deal_random_pressed"]
 [connection signal="pressed" from="Panel/DealNoTriumph" to="." method="_on_deal_no_triumph_pressed"]
 [connection signal="pressed" from="Panel/Help" to="." method="_on_help_pressed"]
 [connection signal="pressed" from="Panel/reset" to="." method="_on_reset_pressed"]
+[connection signal="pressed" from="Panel/return" to="." method="_on_return_pressed"]

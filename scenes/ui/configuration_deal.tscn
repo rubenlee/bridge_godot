@@ -43,7 +43,7 @@ text = "Creación de manos:"
 
 [node name="PanelContainer" type="VBoxContainer" parent="."]
 offset_left = 54.0
-offset_top = 124.0
+offset_top = 202.0
 offset_right = 496.0
 offset_bottom = 670.0
 theme = ExtResource("2_81y6k")
@@ -67,13 +67,13 @@ selected = 0
 popup/item_0/text = "Aleatorio"
 popup/item_0/id = 0
 popup/item_1/text = "Norte"
-popup/item_1/id = 1
+popup/item_1/id = 3
 popup/item_2/text = "Este"
-popup/item_2/id = 2
+popup/item_2/id = 4
 popup/item_3/text = "Oeste"
-popup/item_3/id = 3
-popup/item_4/text = "Sur(jugador)"
-popup/item_4/id = 4
+popup/item_3/id = 2
+popup/item_4/text = "Sur"
+popup/item_4/id = 1
 
 [node name="HBoxContainer4" type="HBoxContainer" parent="PanelContainer"]
 layout_mode = 2
@@ -162,6 +162,7 @@ layout_mode = 2
 size_flags_vertical = 4
 
 [node name="distributionPoint" type="HBoxContainer" parent="PanelContainer"]
+visible = false
 layout_mode = 2
 alignment = 1
 
@@ -242,6 +243,7 @@ layout_mode = 2
 size_flags_vertical = 4
 
 [node name="distributionPoint2" type="HBoxContainer" parent="PanelContainer"]
+visible = false
 layout_mode = 2
 alignment = 1
 
@@ -280,14 +282,13 @@ layout_mode = 2
 size_flags_vertical = 4
 
 [node name="add" type="Button" parent="."]
-offset_left = 478.0
-offset_top = 502.0
-offset_right = 790.0
-offset_bottom = 668.0
+offset_left = 54.0
+offset_top = 589.0
+offset_right = 487.0
+offset_bottom = 662.0
 theme = ExtResource("2_81y6k")
-theme_override_font_sizes/font_size = 58
-text = "Añadir 
-mano"
+theme_override_font_sizes/font_size = 42
+text = "Añadir mano"
 
 [node name="import" type="Button" parent="."]
 visible = false
@@ -339,6 +340,20 @@ grow_vertical = 2
 theme = ExtResource("2_81y6k")
 theme_override_styles/panel = SubResource("StyleBoxFlat_slm2e")
 
+[node name="ColorRect2" type="Panel" parent="."]
+custom_minimum_size = Vector2(100, 3)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 54.0
+offset_top = 179.0
+offset_right = 689.0
+offset_bottom = 182.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_81y6k")
+theme_override_styles/panel = SubResource("StyleBoxFlat_slm2e")
+
 [node name="posiblesGames" type="VBoxContainer" parent="."]
 offset_left = 825.0
 offset_top = 166.0
@@ -346,23 +361,16 @@ offset_right = 1245.0
 offset_bottom = 568.0
 theme = ExtResource("2_81y6k")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
-offset_left = 815.0
-offset_top = 534.0
-offset_right = 1215.0
-offset_bottom = 576.0
-
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
-offset_left = 478.0
-offset_top = 262.0
-offset_right = 790.0
-offset_bottom = 425.0
+[node name="VBoxContainer" type="HBoxContainer" parent="."]
+offset_left = 55.0
+offset_top = 121.0
+offset_right = 689.0
+offset_bottom = 163.0
 
 [node name="Label" type="Label" parent="VBoxContainer"]
 layout_mode = 2
 theme = ExtResource("2_81y6k")
-text = "Mano 
-predeterminada:"
+text = "Cargar mano predeterminada:"
 
 [node name="presetOption" type="OptionButton" parent="VBoxContainer"]
 layout_mode = 2

@@ -1,7 +1,7 @@
 class_name ConfigurationDeal
 extends Node2D
 
-var hands = []
+const TABLE = preload("res://scenes/table/table.tscn")
 
 func _on_add_pressed():
 	var new_hand = {}
@@ -21,27 +21,26 @@ func _on_add_pressed():
 	new_hbox.add_child(new_label)
 	$posiblesGames.add_child(new_hbox)
 	new_button.pressed.connect(func(): 
-		hands.remove_at(new_button.get_parent().get_index())
-		new_button.get_parent().queue_free()
-		print(hands.size()))
-	new_button.theme = load("res://default.tres")
+		Global.hands.remove_at(new_button.get_parent().get_index())
+		new_button.get_parent().queue_free())
+	new_button.theme = default_theme
+	new_label.theme = default_theme
 	new_label.set("theme_override_font_sizes/font_size", 14)
 	new_label.text = label_string
 	new_hand["Dealer"] = $PanelContainer/HBoxContainer5/OptionButton2.get_selected_id()
-	new_hand["AfectedHands"] = $PanelContainer/HBoxContainer4/OptionButton2.get_selected_id()
-	new_hand["game"] = $PanelContainer/HBoxContainer/OptionButton2.get_selected_id() 
+	new_hand["AffectedHands"] = $PanelContainer/HBoxContainer4/OptionButton2.get_selected_id()
+	new_hand["Game"] = $PanelContainer/HBoxContainer/OptionButton2.get_selected_id() 
 	new_hand["mainMinHonorPoints"] = $PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value.value
 	new_hand["mainMaxHonorPoints"] = $PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value2.value
-	new_hand["offMaxHonorPoints"] = $PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value.value
-	new_hand["offMinHonorPoints"] =  $PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value2.value
-	hands.append(new_hand)
-	print(hands.size())
+	new_hand["offMinHonorPoints"] = $PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value.value
+	new_hand["offMaxHonorPoints"] =  $PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value2.value
+	new_hand["inverse"] = false
+	if new_hand["mainMaxHonorPoints"] < new_hand["offMaxHonorPoints"]:
+		new_hand["inverse"] = true
+	Global.hands.append(new_hand)
 
 func _on_start_pressed():
-	var table_scene = preload("res://scenes/table/table.tscn").instantiate()
-	table_scene.hands_playable = hands.duplicate()
-	get_tree().get_root().add_child(table_scene)
-	self.queue_free()
+	get_tree().change_scene_to_packed(TABLE)
 
 func _on_import_pressed():
 	$FileDialog.visible = true
@@ -59,7 +58,7 @@ func _on_option_button_2_item_selected(index) -> void:
 	match index:
 		0:
 			$PanelContainer/Mano.text = "Norte"
-			$PanelContainer/Mano2.text = "Sur"
+			$PanelContainer/Mano2.text = "Sur (jugador)"
 		1:
 			$PanelContainer/Mano.text = "Este"
 			$PanelContainer/Mano2.text = "Oeste"
@@ -81,20 +80,20 @@ func _on_preset_button_pressed():
 		_on_deal_selected(0)
 	match $VBoxContainer/presetOption.get_selected_id():
 		0:
-			$PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value.value = 15
-			$PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value2.value = randi_range(15,17)
-			$PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value.value = 0
-			$PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value2.value = randi_range(0,7)
+			$PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value.value = 15
+			$PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value2.value = 17
+			$PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value.value = 0
+			$PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value2.value = 7
 		1:
-			$PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value.value = 15
-			$PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value2.value = randi_range(15,16)
-			$PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value.value = 8
-			$PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value2.value = randi_range(8,9)
+			$PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value.value = 15
+			$PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value2.value = 16
+			$PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value.value = 8
+			$PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value2.value = 9
 		2:
-			$PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value.value = 15
-			$PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value2.value = randi_range(15,17)
-			$PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value.value = 10
-			$PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value2.value = randi_range(10,15)
+			$PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value.value = 15
+			$PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value2.value = 17
+			$PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value.value = 10
+			$PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value2.value = 15
 			pass
 		3:
 			pass
