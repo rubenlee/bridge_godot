@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=3 uid="uid://bmqt4qrrghudt"]
+[gd_scene load_steps=8 format=3 uid="uid://bmqt4qrrghudt"]
 
 [ext_resource type="Script" path="res://scenes/table/table.gd" id="1_8si85"]
 [ext_resource type="Texture2D" uid="uid://dihasscgbbns5" path="res://Graphics/34379.jpg" id="1_ru0fu"]
 [ext_resource type="PackedScene" uid="uid://b8scu1hn1isma" path="res://scenes/hand/hand.tscn" id="3_o8n2d"]
 [ext_resource type="Theme" uid="uid://g5w7cullef56" path="res://default.tres" id="4_x518n"]
 [ext_resource type="PackedScene" uid="uid://q3vx4alcf1x8" path="res://scenes/bidding/bidding.tscn" id="5_cca3w"]
+[ext_resource type="Script" path="res://scenes/table/algorithmStateMachine.gd" id="6_yqq0v"]
 
 [sub_resource type="Theme" id="Theme_1srym"]
 
@@ -233,6 +234,9 @@ theme = ExtResource("4_x518n")
 text = "Reset"
 
 [node name="Rounds" type="Node" parent="."]
+
+[node name="algorithmStateMachine" type="Node" parent="."]
+script = ExtResource("6_yqq0v")
 
 [connection signal="pressed" from="Panel/DealRandom" to="." method="_on_deal_random_pressed"]
 [connection signal="pressed" from="Panel/DealNoTriumph" to="." method="_on_deal_no_triumph_pressed"]

@@ -39,7 +39,7 @@ offset_bottom = 122.0
 theme = ExtResource("2_81y6k")
 theme_override_fonts/font = ExtResource("3_02qeq")
 theme_override_font_sizes/font_size = 48
-text = "Creación de manos: (No funcional)"
+text = "Creación de manos:"
 
 [node name="PanelContainer" type="VBoxContainer" parent="."]
 offset_left = 54.0

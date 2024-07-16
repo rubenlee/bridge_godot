@@ -2,9 +2,9 @@ class_name ConfigurationDeal
 extends Node2D
 
 var hands = []
-var hands_on_text = []
 
 func _on_add_pressed():
+	var new_hand = {}
 	var new_hbox : HBoxContainer = HBoxContainer.new()
 	var new_button : Button = Button.new()
 	var new_label : Label = Label.new()
@@ -20,22 +20,26 @@ func _on_add_pressed():
 	new_hbox.add_child(new_button)
 	new_hbox.add_child(new_label)
 	$posiblesGames.add_child(new_hbox)
-	new_button.pressed.connect(func(): new_button.get_parent().queue_free())
+	new_button.pressed.connect(func(): 
+		hands.remove_at(new_button.get_parent().get_index())
+		new_button.get_parent().queue_free()
+		print(hands.size()))
 	new_button.theme = load("res://default.tres")
 	new_label.set("theme_override_font_sizes/font_size", 14)
 	new_label.text = label_string
-	'''
-	var index = hands_on_text.size() + 1
-	hands_on_text.append(str(index) + ": newValue")
-	$HBoxContainer/eraseHandOption.add_item(str(index))
-	$RichTextLabel.clear()
-	for eachHand in hands_on_text:
-		$RichTextLabel.add_text(eachHand + "\n")
-	'''
+	new_hand["Dealer"] = $PanelContainer/HBoxContainer5/OptionButton2.get_selected_id()
+	new_hand["AfectedHands"] = $PanelContainer/HBoxContainer4/OptionButton2.get_selected_id()
+	new_hand["game"] = $PanelContainer/HBoxContainer/OptionButton2.get_selected_id() 
+	new_hand["mainMinHonorPoints"] = $PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value.value
+	new_hand["mainMaxHonorPoints"] = $PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value2.value
+	new_hand["offMaxHonorPoints"] = $PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value.value
+	new_hand["offMinHonorPoints"] =  $PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value2.value
+	hands.append(new_hand)
+	print(hands.size())
 
 func _on_start_pressed():
 	var table_scene = preload("res://scenes/table/table.tscn").instantiate()
-	table_scene.dealAmount = 2
+	table_scene.hands_playable = hands.duplicate()
 	get_tree().get_root().add_child(table_scene)
 	self.queue_free()
 

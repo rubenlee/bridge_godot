@@ -2,6 +2,8 @@ class_name Bidding
 extends Control
 
 var pass_counter = 0
+var highest_vote = 0
+var highest_vote_symbol = 0
 signal biddings_over(player_won_bid : int, symbol : int, deal_amount : int)
 
 func _ready():
@@ -9,10 +11,21 @@ func _ready():
 		child.pressed.connect(_on_bid_pressed.bind(child))
 	for child : Button in $bid_rest.get_children():
 		child.pressed.connect(_on_bid_pressed.bind(child))
-	add_blank()
-	add_blank()
 
-func _on_bid_pressed(button : Button) -> void:
+func set_first_turn(turn : int):
+	for i in range(turn):
+		add_blank()
+		
+func deal_pressed(button_name : String):
+	if button_name ==  "pass":
+		$bid_rest/Button36.pressed.emit()
+	else:
+		for child in $bid_grid.get_children():
+			var button : Button = child as Button
+			if button.name == button_name:
+				button.pressed.emit()
+	
+func _on_bid_pressed(button : Button):
 	var new_label : RichTextLabel = $bid_result_grid/Label.duplicate()
 	var value_label = button.text.to_int()
 	new_label.name = button.name
@@ -24,8 +37,9 @@ func _on_bid_pressed(button : Button) -> void:
 			deal_done()
 		return
 	if button.icon != null:
-		new_label.text += "[img=30x30]" + button.icon.resource_path + "[/img]"		
-	var symbol = get_symbol_value(button.name.substr(1))
+		new_label.text += "[img=30x30]" + button.icon.resource_path + "[/img]"
+	highest_vote_symbol = get_symbol_value(button.name.substr(1))
+	highest_vote = value_label
 	for child : Button in $bid_grid.get_children():
 		var value_button_temp = child.text.to_int()
 		if value_label < value_button_temp:
@@ -33,7 +47,7 @@ func _on_bid_pressed(button : Button) -> void:
 		elif value_label > value_button_temp:
 			child.disabled = true
 			continue
-		if symbol >= get_symbol_value(child.name.substr(1)):
+		if highest_vote_symbol >= get_symbol_value(child.name.substr(1)):
 			child.disabled = true
 	
 func deal_done():

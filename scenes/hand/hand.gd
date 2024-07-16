@@ -8,6 +8,7 @@ signal turn_over(whom_ended : int)
 var cards_dict = {}
 var playerInd : int
 var mode: int
+var honor_points: int = 0
 
 func _ready():
 	var parentName : String = self.get_parent().name
@@ -71,6 +72,8 @@ func add_card(newCard : CardUI) -> void:
 		self.add_child(newCard)
 	else:
 		newCard.reparent(self)
+	if newCard.value > 10:
+		honor_points += newCard - 10
 	self.move_child(newCard, position_in_hand)
 		
 func selectable_cards() -> void:
@@ -121,16 +124,26 @@ func _on_card_played() -> void:
 	
 func start_turn():
 	var child = self.get_child(0) as CardUI
+	var npc_controlled = false
+	var root := get_tree().get_first_node_in_group("root") as Table
 	if child.card_visible:
-		selectable_cards()
+		npc_controlled = true
+		
+	if not npc_controlled:
+		if not root.bidding_state:
+			selectable_cards()
 	else:
-		var root := get_tree().get_first_node_in_group("root") as Table
 		match root.symbolPreferred:
 			0:
 				no_trumph_thinking()
 			_:
 				child.card_clicked()
-			#_on_card_played()
+
+func bidding_thinking():
+	if honor_points < 12:
+		return "PASS"
+	else:
+		pass
 	
 func no_trumph_thinking() -> void:
 	var table_layer := get_tree().get_first_node_in_group("table")

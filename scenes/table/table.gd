@@ -9,6 +9,7 @@ signal player2_turn()
 signal player3_turn()
 signal player4_turn()
 
+var hands_playable = []
 var cards = ['314','114','214','414',
 			 '302','102','202','402',
 			 '303','103','203','403',
@@ -28,8 +29,20 @@ var cardsGot = {}
 var symbolPreferred : int = 0
 var dealAmount : int
 var cards_played : int = 0
+var bidding_state : bool = true
 
 func _ready():
+	prepare_cards()
+	$Player1/Hand.turn_over.connect(_on_player_played)
+	$Player2/Hand.turn_over.connect(_on_player_played)
+	$Player3/Hand.turn_over.connect(_on_player_played)
+	$Player4/Hand.turn_over.connect(_on_player_played)
+	$bidding.biddings_over.connect(_on_bidding_over)
+	$Player3/Hand.mouse_filter = $Player3/Hand.MOUSE_FILTER_IGNORE
+	_on_deal_no_triumph_pressed()
+	print(hands_playable)
+	
+func prepare_cards() -> void:
 	for i in cards.size():
 		var card : String = get_card()
 		var value : int = card.substr(1).to_int()
@@ -39,13 +52,16 @@ func _ready():
 		new_card.value = value
 		new_card.symbol = symbol
 		cards_instatiated.append(new_card)
-	$Player1/Hand.turn_over.connect(_on_player_played)
-	$Player2/Hand.turn_over.connect(_on_player_played)
-	$Player3/Hand.turn_over.connect(_on_player_played)
-	$Player4/Hand.turn_over.connect(_on_player_played)
-	$bidding.biddings_over.connect(_on_bidding_over)
-	$Player3/Hand.mouse_filter = $Player3/Hand.MOUSE_FILTER_IGNORE
-	_on_deal_no_triumph_pressed()
+		
+func prepare_table() -> void:
+	var selected_play = hands_playable.pick_random()
+	var player = selected_play["Dealer"]
+	$bidding.set_first_turn(player)
+	while bidding_state:
+		match player:
+			0:
+				$Player1/Hand.bidding_thinking()
+			
 
 func _on_bidding_over(player_won_bid : int, symbol : int, deal_amount : int):
 	$Player3/Hand.mouse_filter = $Player3/Hand.MOUSE_FILTER_PASS
