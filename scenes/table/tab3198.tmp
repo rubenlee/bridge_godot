@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://bmqt4qrrghudt"]
+[gd_scene load_steps=14 format=3 uid="uid://bmqt4qrrghudt"]
 
 [ext_resource type="Script" path="res://scenes/table/table.gd" id="1_orp4p"]
 [ext_resource type="Texture2D" uid="uid://dihasscgbbns5" path="res://Graphics/34379.jpg" id="2_bd12h"]
@@ -6,6 +6,8 @@
 [ext_resource type="PackedScene" uid="uid://b8scu1hn1isma" path="res://scenes/hand/hand.tscn" id="4_ff86f"]
 [ext_resource type="Theme" uid="uid://g5w7cullef56" path="res://default.tres" id="5_61rxa"]
 [ext_resource type="Theme" uid="uid://bgr0ko6oidt8p" path="res://help.tres" id="6_n0nyk"]
+
+[sub_resource type="Theme" id="Theme_1srym"]
 
 [sub_resource type="Animation" id="Animation_oul6w"]
 resource_name = "simple_pop_up"
@@ -147,6 +149,34 @@ offset_right = 1283.0
 offset_bottom = 718.0
 grow_horizontal = 2
 grow_vertical = 0
+
+[node name="DealRandom" type="Button" parent="Panel"]
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -216.0
+offset_bottom = 47.0
+grow_horizontal = 0
+focus_mode = 0
+text = "Repartir Aleatorio"
+
+[node name="DealNoTriumph" type="Button" parent="Panel"]
+visible = false
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -216.0
+offset_top = -46.0
+grow_horizontal = 0
+grow_vertical = 0
+focus_mode = 0
+theme = SubResource("Theme_1srym")
+text = "Repartir no triunfo"
 
 [node name="Help" type="Button" parent="Panel"]
 layout_mode = 1
@@ -365,6 +395,8 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("5_61rxa")
 
+[connection signal="pressed" from="Panel/DealRandom" to="." method="_on_deal_random_pressed"]
+[connection signal="pressed" from="Panel/DealNoTriumph" to="." method="_on_deal_no_triumph_pressed"]
 [connection signal="pressed" from="Panel/Help" to="." method="_on_help_pressed"]
 [connection signal="pressed" from="Panel/reset" to="." method="_on_reset_pressed"]
 [connection signal="pressed" from="Panel/return" to="." method="_on_return_pressed"]

@@ -18,7 +18,16 @@ func _ready():
 			var card_ui := child as CardUI
 			card_ui.reparent_requested.connect(_on_card_ui_reparent_requested)
 			card_ui.card_played.connect(_on_card_played)
-	
+
+func highlight_card(value : int, symbol : int) -> void:
+	for child in get_children():
+		if not child is CardUI:
+			continue
+		var card_ui = child as CardUI
+		if card_ui.value == value and card_ui.symbol == symbol:
+			card_ui.color.color = Color.YELLOW
+			card_ui.color_2.color = Color.YELLOW
+
 func _on_card_ui_reparent_requested(child: CardUI) -> void:
 	child.reparent(self)
 
@@ -120,8 +129,10 @@ func disable_visible_for_cards() -> void:
 		var card_ui = child as CardUI
 		if playerInd != 3:
 			card_ui.color.visible = false
+			card_ui.color.color = Color.RED
 		else:
 			card_ui.color_2.visible = false
+			card_ui.color_2.color = Color.RED
 
 func _on_card_played() -> void:
 	turn_over.emit(playerInd)
@@ -148,13 +159,19 @@ func bidding_thinking(bid_value : int, symbol_value : int, player_voted : int) -
 	if bid_value == 0:
 		if honor_points >= 15 and honor_points <= 17:
 			bid_result = "1NT"
+		elif honor_points >= 20 and honor_points <= 21:
+			bid_result = "2NT"
+		elif honor_points > 24:
+			bid_result = "3NT"
 	else:
-		if bid_value == 1:
-			if symbol_value == 5 and par == playerInd % 2:
-				if honor_points > 9:
-					bid_result = "3NT"
-				elif honor_points > 7:
-					bid_result = "2NT"
+		match bid_value:
+			1:
+				if symbol_value == 5 and par == playerInd % 2:
+					if honor_points > 9:
+						bid_result = "3NT"
+					elif honor_points > 7:
+						bid_result = "2NT"
+			
 	bidding_over.emit(playerInd, bid_result)	
 
 func no_trumph_thinking() -> void:

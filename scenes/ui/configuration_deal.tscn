@@ -110,15 +110,17 @@ text = "Posibles manos:"
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 size_flags_vertical = 4
-item_count = 4
+item_count = 5
 popup/item_0/text = "No Triunfo"
-popup/item_0/id = 0
-popup/item_1/text = "Palo bajo"
-popup/item_1/id = 1
-popup/item_2/text = "Palo Alto"
-popup/item_2/id = 2
-popup/item_3/text = "Monocolor"
-popup/item_3/id = 3
+popup/item_0/id = 4
+popup/item_1/text = "Trebol"
+popup/item_1/id = 0
+popup/item_2/text = "Diamante"
+popup/item_2/id = 1
+popup/item_3/text = "Corazón"
+popup/item_3/id = 2
+popup/item_4/text = "Picas"
+popup/item_4/id = 3
 
 [node name="Mano" type="Label" parent="PanelContainer"]
 layout_mode = 2
@@ -136,7 +138,7 @@ custom_minimum_size = Vector2(275, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
-text = "Puntos de honor:"
+text = "Puntos de honor"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/honorPoint/VBoxContainer"]
 layout_mode = 2
@@ -217,7 +219,7 @@ custom_minimum_size = Vector2(275, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
-text = "Puntos de honor:"
+text = "Puntos de honor"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/honorPoint2/VBoxContainer2"]
 layout_mode = 2
@@ -326,6 +328,30 @@ theme = ExtResource("2_81y6k")
 text = "Volver al
 Menu Principal"
 
+[node name="Label3" type="Label" parent="."]
+visible = false
+custom_minimum_size = Vector2(275, 0)
+offset_left = 299.0
+offset_top = 378.0
+offset_right = 574.0
+offset_bottom = 412.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme = ExtResource("2_81y6k")
+text = "y distribución"
+
+[node name="Label4" type="Label" parent="."]
+visible = false
+custom_minimum_size = Vector2(275, 0)
+offset_left = 299.0
+offset_top = 500.0
+offset_right = 574.0
+offset_bottom = 534.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme = ExtResource("2_81y6k")
+text = "y distribución"
+
 [node name="ColorRect" type="Panel" parent="."]
 custom_minimum_size = Vector2(100, 100)
 anchors_preset = 15
@@ -375,13 +401,15 @@ text = "Cargar mano predeterminada:"
 [node name="presetOption" type="OptionButton" parent="VBoxContainer"]
 layout_mode = 2
 theme = ExtResource("2_81y6k")
-item_count = 3
+item_count = 4
 popup/item_0/text = "1 Sin Triunfo"
 popup/item_0/id = 0
 popup/item_1/text = "2 Sin Triunfo"
 popup/item_1/id = 1
 popup/item_2/text = "3 Sin Triunfo"
 popup/item_2/id = 2
+popup/item_3/text = "1 Corazon"
+popup/item_3/id = 3
 
 [node name="presetButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2

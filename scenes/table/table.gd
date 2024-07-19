@@ -10,10 +10,6 @@ signal player2_turn()
 signal player3_turn()
 signal player4_turn()
 
-var value_dict = {}
-var hands_playable = []
-var rounds_done = []
-var hand_selected = 0
 var cards = ['314','114','214','414',
 			 '302','102','202','402',
 			 '303','103','203','403',
@@ -27,13 +23,21 @@ var cards = ['314','114','214','414',
 			 '311','111','211','411',
 			 '312','112','212','412',
 			 '313','113','213','413']
-			
-var cards_instatiated = []
-var cardsGot = {}
-var symbolPreferred : int = 0
+
+var value_dict := {}
+var hands_playable := []
+var rounds_done := []
+var hand_selected := 0
+var player_won_bid := -1
+var player_turn := -1
+var cards_instatiated := []
+var cardsGot := {}
+var symbolPreferred := 0
 var dealAmount : int
-var cards_played : int = 0
-var bidding_state : bool = true
+var cards_played := 0
+var bidding_state := true
+var bridge_thinker :=  bridge.new()
+var seats := {}
 
 func _ready():
 	prepare_cards()
@@ -50,9 +54,61 @@ func _ready():
 	$Norte/Hand.setPlayerInd(3)
 	$Player1/Hand.setPlayerInd(1)
 	$Norte/Hand.mouse_filter = $Norte/Hand.MOUSE_FILTER_IGNORE
+	print(bridge_thinker.hello_world("hey"))
 	#_on_deal_no_triumph_pressed()
 	prepare_table()
 	
+func clear_seats() -> void:
+	seats.clear()
+	seats["north"] = {}
+	seats["south"] = {}
+	seats["east"] = {}
+	seats["west"] = {}
+	for i in seats:
+		seats[i]["hcp"] = 0
+		seats[i]["dp"] = 0
+		seats[i]["suits"] = [0,0,0,0]
+		seats[i]["cards"] = []
+		seats[i]["regular"] = false
+		seats[i]["balanced"] = false
+
+func test() -> void:
+	clear_seats()
+	var all_cards = cards_instatiated.duplicate()
+	all_cards.shuffle()
+	for i in seats:
+		for p in range(13):
+			var random_card : CardUI = all_cards.pop_front()
+			if random_card.value > 10:
+				seats[i]["hcp"] += random_card.value - 10
+			seats[i]["suits"][random_card.symbol - 1] += 1
+			seats[i]["cards"].append(random_card)
+		seats[i]["regular"] = checkRegular(seats[i]["suits"], false)
+		seats[i]["balanced"] = checkRegular(seats[i]["suits"], true)
+		for p in seats[i]["suits"]:
+			if p < 3:
+				seats[i]["dp"] += 3 - p
+
+
+func checkRegular(hand_suits : Array, balanced : bool):
+	var result = false
+	if hand_suits.count(0) != 0 or hand_suits.count(1) != 0:
+		return result
+	if hand_suits.count(3) == 3:
+		if hand_suits.count(4) == 1:
+			result = true
+	elif hand_suits.count(2) == 1:
+		if hand_suits.count(5) == 1:
+			if hand_suits.count(3) == 2:
+				if balanced:
+					if hand_suits.find(5) < 1:
+						result = true
+				else:
+					result = true
+		if hand_suits.count(4) == 2:
+			result = true
+	return result
+
 func prepare_cards() -> void:
 	for i in cards.size():
 		var card : String = get_card()
@@ -69,12 +125,20 @@ func prepare_table() -> void:
 	if Global.hands.is_empty():
 		_on_deal_random_pressed()
 	else:
-		var selected_play = Global.hands.pick_random()
-		hand_selected = hands_playable.find(selected_play)
+		hand_selected = randi_range(0, Global.hands.size() - 1)
+		var selected_play = Global.hands[hand_selected]
 		player = selected_play["Dealer"]
 		match selected_play["Game"]:
-			0:
+			4:
 				_on_deal_no_triumph_pressed()
+			0:
+				on_deal_suit()
+			1:
+				on_deal_suit()
+			2:
+				on_deal_suit()
+			3:
+				on_deal_suit()
 			_:
 				_on_deal_random_pressed()
 	if player == 0:
@@ -125,6 +189,7 @@ func _on_bidding_over(player_won_bid : int, symbol : int, deal_amount : int):
 		$Panel2/VBoxContainer/HBoxContainer2/Label2.text = "nadie"
 		await start_animation()
 		return
+	self.player_won_bid = player_won_bid
 	bidding_state = false
 	dealAmount = deal_amount 
 	symbolPreferred = symbol
@@ -133,31 +198,52 @@ func _on_bidding_over(player_won_bid : int, symbol : int, deal_amount : int):
 	match symbolPreferred:
 		0: 
 			full_string = "Sin triunfo " + str(dealAmount)
+		1:
+			full_string = "Trebol " + str(dealAmount)
+		2:
+			full_string = "Diamante " + str(dealAmount)
+		3:
+			full_string = "Corazón " + str(dealAmount)
+		4:
+			full_string = "Picas " + str(dealAmount)
 		_:
 			full_string = "Sin triunfo " + str(dealAmount)
 	$Panel2/VBoxContainer/HBoxContainer/Label2.text = full_string
 	$Panel/GameMode.text = full_string
+	$Norte/Hand.mouse_filter = $Norte/Hand.MOUSE_FILTER_PASS
+
+	var node
 	match player_start:
 		1:
 			$Panel2/VBoxContainer/HBoxContainer2/Label2.text = "SUR"
 			await start_animation()
-			$Player1/Hand.start_turn()
+			node = $Player1/Hand
+			player_turn = 1
 		0:
 			$Panel2/VBoxContainer/HBoxContainer2/Label2.text = "ESTE"
 			await start_animation()
-			$Este/Hand.start_turn()
+			node = $Este/Hand
+			player_turn = 2
 		3:
 			$Panel2/VBoxContainer/HBoxContainer2/Label2.text = "NORTE"
 			await start_animation()
-			$Norte/Hand.start_turn()
+			node = $Norte/Hand
+			player_turn = 3
 		2:
 			$Panel2/VBoxContainer/HBoxContainer2/Label2.text = "OESTE"
 			await start_animation()
-			$Oeste/Hand.start_turn()
-	$Norte/Hand.mouse_filter = $Norte/Hand.MOUSE_FILTER_PASS
+			node = $Oeste/Hand
+			player_turn = 4
 	for child in $Norte/Hand.get_children():
 		child.visible = true
-
+		if player_won_bid % 2 == 0:
+			child.card_visible = false
+	for child in $Este/Hand.get_children():
+		child.card_visible = false
+	for child in $Oeste/Hand.get_children():
+		child.card_visible = false
+	node.start_turn()
+	
 func start_animation() -> void:
 	$Panel2/AnimationPlayer.play("simple_pop_up")
 	await $Panel2/AnimationPlayer.animation_finished
@@ -203,12 +289,134 @@ func fill_rest_hands(rest_players : Array):
 	$Norte/Hand.reconnect_signals()
 	$Este/Hand.reconnect_signals()
 
-func _on_help_pressed():
-	pass # Replace with function body.
+func _on_help_pressed() -> void:
+	match symbolPreferred:
+		5:
+			no_trump_help()
+			$helpPanel/AnimationPlayer.play("slide_in")
+			await get_tree().create_timer(5).timeout
+			$helpPanel/AnimationPlayer.play("slide_out")
+		_:
+			print("Not implemented yet")
 
-func _on_deal_no_triumph_pressed():
-	$Panel/DealRandom.disabled = true
-	$Panel/DealNoTriumph.disabled = true
+func no_trump_help() -> void:
+	var hand_to_move : Hand
+	var dead_hand : Hand
+	$helpPanel/RichTextLabel.text = ""
+	if player_turn == 1:
+		hand_to_move = $Player1/Hand
+		dead_hand = $Norte/Hand
+	else:
+		hand_to_move = $Norte/Hand
+		dead_hand = $Player1/Hand
+	if hand_to_move.get_child_count() == 13:
+		$helpPanel/RichTextLabel.text = "Tienes " + str(count_winning_hands(hand_to_move, dead_hand)) + " bazas ganadoras directas y necesitas ganar " + str(dealAmount + 6) + "\n"
+		if $TableCards.get_child_count() != 0:
+			var best_card = get_best_card()
+			if best_card.is_empty():
+				$helpPanel/RichTextLabel.append_text("El oponente ha jugado un As, a lo que se perdera la baza. \n Se recomienda tirar una carta de valor bajo.")
+		else:
+			pass #They lost the bid
+	else:
+		if $TableCards.get_child_count() != 0:
+			if not hand_to_move.cards_dict[$TableCards.get_child(0).symbol].is_empty():
+				$helpPanel/RichTextLabel.text = "Al no tener cartas del tipo de la que se esta jugando la baza.\n Se recomienda tirar una carta de bajo valor"
+		else:
+			pass
+
+func get_best_card() -> Array:
+	var result = []
+	for child : CardUI in $TableCards.get_children():
+		if child.value == 14 and symbolPreferred == child.symbol:
+			if child.player == 2 or child.player == 4:
+				return result
+	return result
+
+func count_winning_hands(main_hand : Hand, dead_hand : Hand) -> int:
+	var result : int = 0
+	var main_dict = main_hand.cards_dict
+	var dead_dict = dead_hand.cards_dict
+	for i in range(1,5):
+		var had_previous : bool = false
+		var max_winning : int
+		if main_dict.has(i) and dead_dict.has(i):
+			if main_dict[i].size() >= dead_dict[i].size():
+				max_winning = main_dict[i].size()
+			else:
+				max_winning = dead_dict[i].size()
+		for j in range(14, 11, -1):
+			if main_dict.has(i):
+				if main_dict[i].find(j) != -1:
+					if had_previous or j == 14:
+						result += 1
+						had_previous = true
+						if result == max_winning:
+							break
+						continue
+			if dead_dict.has(i):
+				if dead_dict[i].find(j) != -1:
+					if had_previous or j == 14:
+						result += 1
+						had_previous = true
+						if result == max_winning:
+							break
+						continue
+	return result
+
+func on_deal_suit():
+	var tries := 0
+	var seat_string := "north"
+	var seat_dead := "south"
+	if Global.hands[hand_selected]["AffectedHands"] != 0:
+		seat_string = "west"
+		seat_dead = "east"
+	var main_max = Global.hands[hand_selected]["mainMaxHonorPoints"]
+	var main_min = Global.hands[hand_selected]["mainMinHonorPoints"]
+	var dead_max = Global.hands[hand_selected]["offMaxHonorPoints"]
+	var dead_min = Global.hands[hand_selected]["offMinHonorPoints"]
+	if Global.hands[hand_selected]["inverse"]:
+		var temp := seat_string
+		seat_string = seat_dead
+		seat_dead = temp
+		main_max = Global.hands[hand_selected]["offMaxHonorPoints"]
+		main_min = Global.hands[hand_selected]["offMinHonorPoints"]
+		dead_max = Global.hands[hand_selected]["mainMaxHonorPoints"]
+		dead_min = Global.hands[hand_selected]["mainMinHonorPoints"]
+	while true:
+		test()	
+		tries += 1
+		if (seats[seat_string]["suits"][Global.hands[hand_selected]["Game"]] > 4 and seats[seat_string]["hcp"] >= main_min and seats[seat_string]["hcp"] <= main_max) and (seats[seat_dead]["suits"][Global.hands[hand_selected]["Game"]] > 2 and seats[seat_dead]["hcp"] >= dead_min and seats[seat_dead]["hcp"] <= dead_max):
+			break
+	print(tries)
+	deal_cards_seats()
+
+func _on_deal_no_triumph_pressed() -> void:
+	var tries := 0
+	var seat_string := "north"
+	var seat_dead := "south"
+	if Global.hands[hand_selected]["AffectedHands"] != 0:
+		seat_string = "west"
+		seat_dead = "east"
+	var main_max = Global.hands[hand_selected]["mainMaxHonorPoints"]
+	var main_min = Global.hands[hand_selected]["mainMinHonorPoints"]
+	var dead_max = Global.hands[hand_selected]["offMaxHonorPoints"]
+	var dead_min = Global.hands[hand_selected]["offMinHonorPoints"]
+	if Global.hands[hand_selected]["inverse"]:
+		var temp := seat_string
+		seat_string = seat_dead
+		seat_dead = temp
+		main_max = Global.hands[hand_selected]["offMaxHonorPoints"]
+		main_min = Global.hands[hand_selected]["offMinHonorPoints"]
+		dead_max = Global.hands[hand_selected]["mainMaxHonorPoints"]
+		dead_min = Global.hands[hand_selected]["mainMinHonorPoints"]
+	while true:
+		test()	
+		tries += 1
+		if (seats[seat_string]["balanced"] and seats[seat_string]["hcp"] >= main_min and seats[seat_string]["hcp"] <= main_max) and (seats[seat_dead]["hcp"] >= dead_min and seats[seat_dead]["hcp"] <= dead_max):
+			break
+	print(tries)
+	deal_cards_seats()
+	'''
 	if Global.hands[hand_selected]["AffectedHands"] == 0:
 		if Global.hands[hand_selected]["inverse"]:
 			notrumph_main_hand(1, Global.hands[hand_selected]["offMinHonorPoints"], Global.hands[hand_selected]["offMaxHonorPoints"])
@@ -218,39 +426,42 @@ func _on_deal_no_triumph_pressed():
 			notrumph_off_hand(3, Global.hands[hand_selected]["offMinHonorPoints"], Global.hands[hand_selected]["offMaxHonorPoints"])
 		fill_rest_hands([2,4])
 	else:
-		notrumph_main_hand(4, Global.hands[hand_selected]["mainMinHonorPoints"], Global.hands[hand_selected]["mainMaxHonorPoints"])
-		notrumph_off_hand(2, Global.hands[hand_selected]["mainMinHonorPoints"], Global.hands[hand_selected]["mainMaxHonorPoints"])
+		if Global.hands[hand_selected]["inverse"]:
+			notrumph_main_hand(2, Global.hands[hand_selected]["offMinHonorPoints"], Global.hands[hand_selected]["offMaxHonorPoints"])
+			notrumph_off_hand(4, Global.hands[hand_selected]["mainMinHonorPoints"], Global.hands[hand_selected]["mainMaxHonorPoints"])
+		else:
+			notrumph_main_hand(2, Global.hands[hand_selected]["mainMinHonorPoints"], Global.hands[hand_selected]["mainMaxHonorPoints"])
+			notrumph_off_hand(4, Global.hands[hand_selected]["offMinHonorPoints"], Global.hands[hand_selected]["offMaxHonorPoints"])
 		fill_rest_hands([1,3])
+	'''
 
-func _on_deal_random_pressed():
-	$Panel/DealRandom.disabled = true
-	$Panel/DealNoTriumph.disabled = true
-	var counter :int = 1
-	for i in cards_instatiated.size():
-		var card : CardUI = get_card_instatiated()
-		counter += 1	
-		match counter:
-			1:
-				card.card_visible = true
-				card.player = counter
-				$Player1/Hand.add_card(card)
-			2:
-				card.player = counter
-				$Oeste/Hand.add_card(card)
-			3:
-				card.visible = false
-				card.card_visible = true
-				card.player = counter
-				$Norte/Hand.add_card(card)
-			4:
-				card.player = counter
-				$Este/Hand.add_card(card)
-		counter %= 4
+func deal_cards_seats():
+	for i in seats:
+		for j : CardUI in seats[i]["cards"]:
+			match i:
+				"north":
+					j.visible = false
+					j.card_visible = true
+					j.player = 3
+					$Norte/Hand.add_card(j)
+				"south":
+					j.card_visible = true
+					j.player = 1
+					$Player1/Hand.add_card(j)
+				"east":
+					j.player = 4
+					$Este/Hand.add_card(j)
+				"west":
+					j.player = 2
+					$Oeste/Hand.add_card(j)
 	$Player1/Hand.reconnect_signals()
 	$Oeste/Hand.reconnect_signals()
 	$Norte/Hand.reconnect_signals()
 	$Este/Hand.reconnect_signals()
-	#$Player1/Hand.start_turn()
+
+func _on_deal_random_pressed():
+	test()
+	deal_cards_seats()
 
 func get_amount_of_points(pointsToReach: int):
 	var point_dict = {}
@@ -525,6 +736,7 @@ func search_card(symbol : int, value : int, player : int) -> void:
 func _on_player_played(player_turn_ended : int) -> void:
 	var next_turn = player_turn_ended + 1
 	cards_played += 1
+	$Panel/Help.disabled = true
 	if next_turn > 4:
 		next_turn = 1
 	if cards_played == 4:
@@ -533,12 +745,16 @@ func _on_player_played(player_turn_ended : int) -> void:
 	if $Rounds.get_child_count() == 13:
 		print("se acabo la partida")
 		return
+	player_turn = next_turn
 	match next_turn:
 		1:
+			$Panel/Help.disabled = false
 			player1_turn.emit()
 		2:
 			player2_turn.emit()
 		3:
+			if player_won_bid % 2 == 1:
+				$Panel/Help.disabled = false
 			player3_turn.emit()
 		4:
 			player4_turn.emit()
@@ -592,6 +808,7 @@ func check_winner_of_round() -> int:
 		tween.tween_property(child, "global_position", direction , 1)
 	await tween.finished
 	for child in table_layer.get_children():
+		child.visible = false
 		child.reparent(new_node)
 	$Rounds.add_child(new_node)
 	return winner
@@ -600,4 +817,5 @@ func _on_reset_pressed():
 	get_tree().reload_current_scene()
 
 func _on_return_pressed():
+	Global.hands.clear()
 	get_tree().change_scene_to_file("res://scenes/ui/configuration_deal.tscn")

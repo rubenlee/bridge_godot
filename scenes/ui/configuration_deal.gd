@@ -3,8 +3,10 @@ extends Node2D
 
 const TABLE = preload("res://scenes/table/table.tscn")
 
-func _on_add_pressed():
-	var new_hand = {}
+func _on_ready():
+	pass
+
+func add_new_hand():
 	var new_hbox : HBoxContainer = HBoxContainer.new()
 	var new_button : Button = Button.new()
 	var new_label : Label = Label.new()
@@ -27,6 +29,10 @@ func _on_add_pressed():
 	new_label.theme = default_theme
 	new_label.set("theme_override_font_sizes/font_size", 14)
 	new_label.text = label_string
+
+func _on_add_pressed():
+	var new_hand = {}
+	add_new_hand()
 	new_hand["Dealer"] = $PanelContainer/HBoxContainer5/OptionButton2.get_selected_id()
 	new_hand["AffectedHands"] = $PanelContainer/HBoxContainer4/OptionButton2.get_selected_id()
 	new_hand["Game"] = $PanelContainer/HBoxContainer/OptionButton2.get_selected_id() 
@@ -66,10 +72,17 @@ func _on_option_button_2_item_selected(index) -> void:
 
 func _on_deal_selected(index):
 	var visible_distribution = true
-	if index == 0:
-		visible_distribution = false
-	$PanelContainer/distributionPoint.visible = visible_distribution
-	$PanelContainer/distributionPoint2.visible = visible_distribution
+	match index:
+		0:
+			visible_distribution = false
+		1:
+			visible_distribution = false
+		_:
+			pass
+	$Label3.visible = visible_distribution
+	$Label4.visible = visible_distribution
+	#$PanelContainer/distributionPoint.visible = visible_distribution
+	#$PanelContainer/distributionPoint2.visible = visible_distribution
 
 
 func _on_preset_button_pressed():
@@ -96,4 +109,10 @@ func _on_preset_button_pressed():
 			$PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value2.value = 15
 			pass
 		3:
+			$PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value.value = 12
+			$PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value2.value = 20
+			$PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value.value = 0
+			$PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value2.value = 6
+			_on_deal_selected(3)
+			$PanelContainer/HBoxContainer/OptionButton2.select(3)
 			pass
