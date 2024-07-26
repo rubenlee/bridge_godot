@@ -231,7 +231,7 @@ func _on_bidding_over(player_won_bid : int, symbol : int, deal_amount : int):
 		1:
 			$Panel2/VBoxContainer/HBoxContainer2/Label2.text = "SUR"
 			$Oeste/visibleHand.visible = true
-			dead_hand = $Oeste/Hand
+			dead_hand = $Este/Hand
 			$Norte/Hand.position -= Vector2(0,125)
 			await start_animation()
 			node = $Player1/Hand
@@ -326,7 +326,10 @@ func _on_help_pressed() -> void:
 				await get_tree().create_timer(5).timeout
 				$helpPanel/AnimationPlayer.play("slide_out")
 			_:
-				print("Not implemented yet")
+				symbol_help()
+				$helpPanel/AnimationPlayer.play("slide_in")
+				await get_tree().create_timer(5).timeout
+				$helpPanel/AnimationPlayer.play("slide_out")
 
 func bid_help() -> void:
 	var highest_value := 0
@@ -407,34 +410,66 @@ func bid_help() -> void:
 func no_trump_help() -> void:
 	var hand_to_move : Hand
 	var dead_hand_ally = false
-	$helpPanel/RichTextLabel.text = ""
-	if dead_hand.playerInd == 3
+	$helpPanel/RichTextLabel.clear()
+	if dead_hand.playerInd == 3:
+		dead_hand_ally = true
+	var temp_dead_hand = dead_hand
+	if player_turn == 1:
+		hand_to_move = $Player1/Hand
+		if hand_to_move.playerInd == dead_hand.playerInd:
+			temp_dead_hand = $Norte/Hand
+	else:
+		hand_to_move = $Norte/Hand
+		if hand_to_move.playerInd == dead_hand.playerInd:
+			temp_dead_hand = $Player1/Hand
+	var cards_in_table = get_cards_and_check()
+	if not cards_in_table.is_empty():
+		if cards_in_table.front() == -1:
+			$helpPanel/RichTextLabel.append_text("El oponente ha jugado un As, a lo que se perdera la baza. \n Se recomienda tirar una carta de valor bajo.")
+			return
+		if not hand_to_move.cards_dict[cards_in_table[0].symbol].is_empty():
+			$helpPanel/RichTextLabel.text = "Al no tener cartas del tipo de la que se esta jugando la baza.\n Se recomienda tirar una carta de bajo valor"
+			return
+	$helpPanel/RichTextLabel.text = "Tienes " + str(count_winning_hands(hand_to_move, temp_dead_hand)) + " bazas ganadoras directas y necesitas ganar " + str(dealAmount + 6) + "\n"
+	if $TableCards.get_child_count() != 0:
+		$helpPanel/RichTextLabel.append_text("Asegura todas las bazas que puedas ganar siempre")
+	else:
+		$helpPanel/RichTextLabel.append_text("Si tienes una secuencia de honores juega la mayor\n En caso de no tener tira la 4ª del palo más largo que tengas")
+		return
+
+func symbol_help():
+	var hand_to_move : Hand
+	var dead_hand_ally = false
+	$helpPanel/RichTextLabel.text.clear()
+	if dead_hand.playerInd == 3:
 		dead_hand_ally = true
 	if player_turn == 1:
 		hand_to_move = $Player1/Hand
 	else:
 		hand_to_move = $Norte/Hand
-	var best_card = get_best_card()
-	if hand_to_move.get_child_count() == 13:
-		$helpPanel/RichTextLabel.text = "Tienes " + str(count_winning_hands(hand_to_move, dead_hand)) + " bazas ganadoras directas y necesitas ganar " + str(dealAmount + 6) + "\n"
-		if $TableCards.get_child_count() != 0:
-			if best_card.is_empty():
-					$helpPanel/RichTextLabel.append_text("En desarrollo")
+	var cards_in_table = get_cards_and_check()
+	if not cards_in_table.is_empty():
+		if cards_in_table.front() == -1 and cards_in_table.front().symbol == symbolPreferred:
+			$helpPanel/RichTextLabel.append_text("El oponente ha jugado un As, a lo que se perdera la baza. \n Se recomienda tirar una carta de valor bajo.")
+			return
+		if not hand_to_move.cards_dict[cards_in_table[0].symbol].is_empty():
+			if cards_in_table[0].symbol != symbolPreferred and not hand_to_move.cards_dict[symbolPreferred].is_empty():
+				$helpPanel/RichTextLabel.text = "Puedes fallar con una carta del palo al que se esta jugando y poder ganar la ronda"
+				return
 			else:
-				if best_card.front() == -1:
-					$helpPanel/RichTextLabel.append_text("El oponente ha jugado un As, a lo que se perdera la baza. \n Se recomienda tirar una carta de valor bajo.")
-		else:
-			pass #They lost the bid
+				$helpPanel/RichTextLabel.text = "Al no tener carta del palo que se esta jugando, falla con cualquier carta"
+				return
+			return
+	$helpPanel/RichTextLabel.append_text("Intenta descartarte del palo más corto para poder fallar al palo ganador")
+	'''
+	if $TableCards.get_child_count() != 0:
+		$helpPanel/RichTextLabel.append_text("Asegura todas las bazas que puedas ganar siempre")
 	else:
-		if $TableCards.get_child_count() != 0:
-			if not hand_to_move.cards_dict[$TableCards.get_child(0).symbol].is_empty():
-				$helpPanel/RichTextLabel.text = "Al no tener cartas del tipo de la que se esta jugando la baza.\n Se recomienda tirar una carta de bajo valor"
-			elif best_card.front() == -1:
-				$helpPanel/RichTextLabel.append_text("El oponente ha jugado un As, a lo que se perdera la baza. \n Se recomienda tirar una carta de valor bajo.")
-		else:
-			pass
+		$helpPanel/RichTextLabel.append_text("Si tienes una secuencia de honores juega la mayor\n En caso de no tener tira la 4ª del palo más largo que tengas")
+		return
+	'''
 
-func get_best_card() -> Array:
+func get_cards_and_check() -> Array:
 	var result = []
 	for child : CardUI in $TableCards.get_children():
 		if child.value == 14 and (symbolPreferred == child.symbol or symbolPreferred == 5):
@@ -443,13 +478,10 @@ func get_best_card() -> Array:
 				return result
 	return result
 
-func count_losing_hands(main_hand : Hand, dead_hand : Hand) -> int:
-	return 0
-
-func count_winning_hands(main_hand : Hand, dead_hand : Hand) -> int:
+func count_winning_hands(main_hand : Hand, dead_hand_temp : Hand) -> int:
 	var result : int = 0
 	var main_dict = main_hand.cards_dict
-	var dead_dict = dead_hand.cards_dict
+	var dead_dict = dead_hand_temp.cards_dict
 	for i in range(1,5):
 		var had_previous : bool = false
 		var max_winning : int
