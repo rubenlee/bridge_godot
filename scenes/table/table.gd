@@ -36,7 +36,8 @@ var symbolPreferred := 0
 var dealAmount : int
 var cards_played := 0
 var bidding_state := true
-var bridge_thinker :=  bridge.new()
+var dead_hand : Hand
+#var bridge_thinker :=  bridge.new()
 var seats := {}
 
 func _ready():
@@ -54,16 +55,15 @@ func _ready():
 	$Norte/Hand.setPlayerInd(3)
 	$Player1/Hand.setPlayerInd(1)
 	$Norte/Hand.mouse_filter = $Norte/Hand.MOUSE_FILTER_IGNORE
-	print(bridge_thinker.hello_world("hey"))
 	#_on_deal_no_triumph_pressed()
 	prepare_table()
 	
 func clear_seats() -> void:
 	seats.clear()
-	seats["north"] = {}
 	seats["south"] = {}
-	seats["east"] = {}
 	seats["west"] = {}
+	seats["north"] = {}
+	seats["east"] = {}
 	for i in seats:
 		seats[i]["hcp"] = 0
 		seats[i]["dp"] = 0
@@ -72,7 +72,7 @@ func clear_seats() -> void:
 		seats[i]["regular"] = false
 		seats[i]["balanced"] = false
 
-func test() -> void:
+func generate_hands() -> void:
 	clear_seats()
 	var all_cards = cards_instatiated.duplicate()
 	all_cards.shuffle()
@@ -82,13 +82,24 @@ func test() -> void:
 			if random_card.value > 10:
 				seats[i]["hcp"] += random_card.value - 10
 			seats[i]["suits"][random_card.symbol - 1] += 1
-			seats[i]["cards"].append(random_card)
+			seats[i]["cards"].insert(get_index_order(i, random_card), random_card)
 		seats[i]["regular"] = checkRegular(seats[i]["suits"], false)
 		seats[i]["balanced"] = checkRegular(seats[i]["suits"], true)
 		for p in seats[i]["suits"]:
 			if p < 3:
 				seats[i]["dp"] += 3 - p
 
+func get_index_order(index : String, random_card : CardUI ) -> int:
+	var result = 0
+	for temp_node : CardUI in seats[index]["cards"]:
+		if random_card.symbol > temp_node.symbol:
+			break
+		elif random_card.symbol == temp_node.symbol:
+			if random_card.value < temp_node.value:
+				result += 1
+		else:
+			result += 1
+	return result
 
 func checkRegular(hand_suits : Array, balanced : bool):
 	var result = false
@@ -145,8 +156,10 @@ func prepare_table() -> void:
 		player = randi_range(1,4)
 	if player == 1:
 		$bidding.toggle_buttons(false)	
+		$Panel/Help.disabled = false
 	else:
 		$bidding.toggle_buttons(true)	
+		$Panel/Help.disabled = true
 	match player:
 		3:
 			$bidding.set_first_turn(2)
@@ -169,8 +182,10 @@ func _on_bidding_deal(player : int, deal : String) -> void:
 		next_turn = 1
 	if next_turn == 1 and bidding_state:
 		$bidding.toggle_buttons(false)	
+		$Panel/Help.disabled = false
 	else:
 		$bidding.toggle_buttons(true)	
+		$Panel/Help.disabled = true
 	await get_tree().create_timer(0.5).timeout 
 	if $bidding.dealt:
 		return
@@ -211,26 +226,33 @@ func _on_bidding_over(player_won_bid : int, symbol : int, deal_amount : int):
 	$Panel2/VBoxContainer/HBoxContainer/Label2.text = full_string
 	$Panel/GameMode.text = full_string
 	$Norte/Hand.mouse_filter = $Norte/Hand.MOUSE_FILTER_PASS
-
 	var node
 	match player_start:
 		1:
 			$Panel2/VBoxContainer/HBoxContainer2/Label2.text = "SUR"
+			$Oeste/visibleHand.visible = true
+			dead_hand = $Oeste/Hand
+			$Norte/Hand.position -= Vector2(0,125)
 			await start_animation()
 			node = $Player1/Hand
 			player_turn = 1
 		0:
 			$Panel2/VBoxContainer/HBoxContainer2/Label2.text = "ESTE"
+			dead_hand = $Player1/Hand
 			await start_animation()
 			node = $Este/Hand
 			player_turn = 2
 		3:
 			$Panel2/VBoxContainer/HBoxContainer2/Label2.text = "NORTE"
+			$Este/visibleHand.visible = true
+			dead_hand = $Este/Hand
+			$Norte/Hand.position -= Vector2(0,125)
 			await start_animation()
 			node = $Norte/Hand
 			player_turn = 3
 		2:
 			$Panel2/VBoxContainer/HBoxContainer2/Label2.text = "OESTE"
+			dead_hand = $Norte/Hand
 			await start_animation()
 			node = $Oeste/Hand
 			player_turn = 4
@@ -238,6 +260,7 @@ func _on_bidding_over(player_won_bid : int, symbol : int, deal_amount : int):
 		child.visible = true
 		if player_won_bid % 2 == 0:
 			child.card_visible = false
+			child.show_card()
 	for child in $Este/Hand.get_children():
 		child.card_visible = false
 	for child in $Oeste/Hand.get_children():
@@ -290,47 +313,138 @@ func fill_rest_hands(rest_players : Array):
 	$Este/Hand.reconnect_signals()
 
 func _on_help_pressed() -> void:
-	match symbolPreferred:
-		5:
-			no_trump_help()
-			$helpPanel/AnimationPlayer.play("slide_in")
-			await get_tree().create_timer(5).timeout
-			$helpPanel/AnimationPlayer.play("slide_out")
-		_:
-			print("Not implemented yet")
+	if bidding_state:
+		bid_help()
+		$helpPanel/AnimationPlayer.play("slide_in")
+		await get_tree().create_timer(5).timeout
+		$helpPanel/AnimationPlayer.play("slide_out")
+	else:
+		match symbolPreferred:
+			5:
+				no_trump_help()
+				$helpPanel/AnimationPlayer.play("slide_in")
+				await get_tree().create_timer(5).timeout
+				$helpPanel/AnimationPlayer.play("slide_out")
+			_:
+				print("Not implemented yet")
+
+func bid_help() -> void:
+	var highest_value := 0
+	var symbol := 0
+	var highest_player := 0
+	var highest_bid  := ""
+	var friend_bid := ""
+	for i : String in $bidding.bid_log:
+		if i.is_empty():
+			continue
+		if i.substr(2) == '3':
+			friend_bid = i
+			if friend_bid.substr(1,1).to_int() > symbol:
+				if friend_bid.substr(0,1).to_int() > highest_value:
+					highest_value = friend_bid.substr(0,1).to_int()
+					symbol = friend_bid.substr(1,1).to_int()
+					highest_player = 3
+		else:
+			highest_bid = i
+			if highest_bid.substr(1,1).to_int() > symbol:
+				if highest_bid.substr(0,1).to_int() > highest_value:
+					highest_value = highest_bid.substr(0,1).to_int()
+					symbol = highest_bid.substr(1,1).to_int()
+					highest_player = i.substr(2).to_int()
+	if highest_player == 0:
+		if seats["south"].balanced:
+			if (seats["south"]["hcp"] >= 15 and seats["south"]["hcp"] <= 17):
+				$helpPanel/RichTextLabel.text = "Tienes una manor equilibrada y con suficientes puntos de honor para abrir de 1 sin triunfo\n"
+				return
+			elif seats["south"]["hcp"] >= 20 and seats["south"]["hcp"] <= 22:
+				$helpPanel/RichTextLabel.text = "Tienes una manor equilibrada y con suficientes puntos de honor para abrir de 2 sin triunfo\n"
+				return	
+		var high_trump := false
+		for i in range(2,4):
+			if seats["south"]["suits"][i] >= 5:
+				high_trump = true
+		if high_trump:
+			if (seats["south"]["hcp"] >= 12 and seats["south"]["hcp"] <= 20):
+				$helpPanel/RichTextLabel.text = "Tienes al menos  y con suficientes puntos de honor para abrir de 1 de palo mayor\n"
+				return
+		$helpPanel/RichTextLabel.text = "Tienes muy pocos puntos de honor o combinación disponible\n"
+	else:
+		if highest_player == 3:
+			match symbol:
+				5:
+					if (seats["south"]["hcp"] >= 8 and seats["south"]["hcp"] <= 9):
+						$helpPanel/RichTextLabel.text = "Puedes apoyar a tu compañero aumentando a 2 sin triunfo\n"
+						return
+					elif (seats["south"]["hcp"] >= 10 and seats["south"]["hcp"] <= 15):
+						$helpPanel/RichTextLabel.text = "Puedes apoyar a tu compañero aumentando a 3 sin triunfo\n"
+						return
+				3,4:
+					if seats["south"]["suits"][symbol] >= 5:
+						if (seats["south"]["hcp"] + seats["south"]["dp"] >= 6 and seats["south"]["hcp"] + seats["south"]["dp"] <= 10):
+							$helpPanel/RichTextLabel.text = "Puedes apoyar a tu compañero aumentando a 2 del mismo palo\n"
+							return
+						elif (seats["south"]["hcp"] + seats["south"]["dp"] >= 11 and seats["south"]["hcp"] + seats["south"]["dp"] <= 12):
+							$helpPanel/RichTextLabel.text = "Puedes apoyar a tu compañero aumentando a 3 del mismo palo\n"
+							return
+						elif (seats["south"]["hcp"] + seats["south"]["dp"] >= 13 and seats["south"]["hcp"] + seats["south"]["dp"] <= 15):
+							$helpPanel/RichTextLabel.text = "Puedes apoyar a tu compañero aumentando a 4 del mismo palo\n"
+							return
+					else:
+						if seats["south"]["suits"][symbol] < 4 and seats["south"]["regular"]:
+							if (seats["south"]["hcp"] >= 6 and seats["south"]["hcp"] <= 10):
+								$helpPanel/RichTextLabel.text = "Puedes cambiar a 1 sin triunfo\n"
+								return
+							elif (seats["south"]["hcp"] >= 11 and seats["south"]["hcp"] <= 12):
+								$helpPanel/RichTextLabel.text = "Puedes cambiar a 2 sin triunfo\n"
+								return
+							elif (seats["south"]["hcp"] >= 13 and seats["south"]["hcp"] <= 15):
+								$helpPanel/RichTextLabel.text = "Puedes cambiar a 3 sin triunfo\n"
+								return
+				_:
+					pass
+			$helpPanel/RichTextLabel.text = "Ningún movimiento notable que hacer, recomendado pasar\n"
 
 func no_trump_help() -> void:
 	var hand_to_move : Hand
-	var dead_hand : Hand
+	var dead_hand_ally = false
 	$helpPanel/RichTextLabel.text = ""
+	if dead_hand.playerInd == 3
+		dead_hand_ally = true
 	if player_turn == 1:
 		hand_to_move = $Player1/Hand
-		dead_hand = $Norte/Hand
 	else:
 		hand_to_move = $Norte/Hand
-		dead_hand = $Player1/Hand
+	var best_card = get_best_card()
 	if hand_to_move.get_child_count() == 13:
 		$helpPanel/RichTextLabel.text = "Tienes " + str(count_winning_hands(hand_to_move, dead_hand)) + " bazas ganadoras directas y necesitas ganar " + str(dealAmount + 6) + "\n"
 		if $TableCards.get_child_count() != 0:
-			var best_card = get_best_card()
 			if best_card.is_empty():
-				$helpPanel/RichTextLabel.append_text("El oponente ha jugado un As, a lo que se perdera la baza. \n Se recomienda tirar una carta de valor bajo.")
+					$helpPanel/RichTextLabel.append_text("En desarrollo")
+			else:
+				if best_card.front() == -1:
+					$helpPanel/RichTextLabel.append_text("El oponente ha jugado un As, a lo que se perdera la baza. \n Se recomienda tirar una carta de valor bajo.")
 		else:
 			pass #They lost the bid
 	else:
 		if $TableCards.get_child_count() != 0:
 			if not hand_to_move.cards_dict[$TableCards.get_child(0).symbol].is_empty():
 				$helpPanel/RichTextLabel.text = "Al no tener cartas del tipo de la que se esta jugando la baza.\n Se recomienda tirar una carta de bajo valor"
+			elif best_card.front() == -1:
+				$helpPanel/RichTextLabel.append_text("El oponente ha jugado un As, a lo que se perdera la baza. \n Se recomienda tirar una carta de valor bajo.")
 		else:
 			pass
 
 func get_best_card() -> Array:
 	var result = []
 	for child : CardUI in $TableCards.get_children():
-		if child.value == 14 and symbolPreferred == child.symbol:
+		if child.value == 14 and (symbolPreferred == child.symbol or symbolPreferred == 5):
 			if child.player == 2 or child.player == 4:
+				result.append(-1)
 				return result
 	return result
+
+func count_losing_hands(main_hand : Hand, dead_hand : Hand) -> int:
+	return 0
 
 func count_winning_hands(main_hand : Hand, dead_hand : Hand) -> int:
 	var result : int = 0
@@ -374,6 +488,10 @@ func on_deal_suit():
 	var main_min = Global.hands[hand_selected]["mainMinHonorPoints"]
 	var dead_max = Global.hands[hand_selected]["offMaxHonorPoints"]
 	var dead_min = Global.hands[hand_selected]["offMinHonorPoints"]
+	var main_dist_min = Global.hands[hand_selected]["mainMinDistributionPoints"]
+	var main_dist_max = Global.hands[hand_selected]["mainMaxDistributionPoints"]
+	var dead_dist_max = Global.hands[hand_selected]["offMaxDistributionPoints"]
+	var dead_dist_min = Global.hands[hand_selected]["offMinDistributionPoints"]
 	if Global.hands[hand_selected]["inverse"]:
 		var temp := seat_string
 		seat_string = seat_dead
@@ -382,10 +500,19 @@ func on_deal_suit():
 		main_min = Global.hands[hand_selected]["offMinHonorPoints"]
 		dead_max = Global.hands[hand_selected]["mainMaxHonorPoints"]
 		dead_min = Global.hands[hand_selected]["mainMinHonorPoints"]
+		main_dist_min = Global.hands[hand_selected]["offMinDistributionPoints"]
+		main_dist_max = Global.hands[hand_selected]["offMaxDistributionPoints"]
+		dead_dist_max = Global.hands[hand_selected]["mainMaxDistributionPoints"]
+		dead_dist_min = Global.hands[hand_selected]["mainMinDistributionPoints"]
 	while true:
-		test()	
+		generate_hands()	
 		tries += 1
-		if (seats[seat_string]["suits"][Global.hands[hand_selected]["Game"]] > 4 and seats[seat_string]["hcp"] >= main_min and seats[seat_string]["hcp"] <= main_max) and (seats[seat_dead]["suits"][Global.hands[hand_selected]["Game"]] > 2 and seats[seat_dead]["hcp"] >= dead_min and seats[seat_dead]["hcp"] <= dead_max):
+		if (seats[seat_string]["suits"][Global.hands[hand_selected]["Game"]] > 4 and \
+			seats[seat_string]["hcp"] >= main_min and seats[seat_string]["hcp"] <= main_max and \
+			seats[seat_string]["dp"] >= main_dist_min and seats[seat_string]["dp"] <= main_dist_max) and \
+			(seats[seat_dead]["suits"][Global.hands[hand_selected]["Game"]] > 2 and \
+			seats[seat_dead]["hcp"] >= dead_min and seats[seat_dead]["hcp"] <= dead_max and \
+			seats[seat_dead]["dp"] >= dead_dist_min and seats[seat_dead]["dp"] <= dead_dist_max):
 			break
 	print(tries)
 	deal_cards_seats()
@@ -410,30 +537,12 @@ func _on_deal_no_triumph_pressed() -> void:
 		dead_max = Global.hands[hand_selected]["mainMaxHonorPoints"]
 		dead_min = Global.hands[hand_selected]["mainMinHonorPoints"]
 	while true:
-		test()	
+		generate_hands()	
 		tries += 1
 		if (seats[seat_string]["balanced"] and seats[seat_string]["hcp"] >= main_min and seats[seat_string]["hcp"] <= main_max) and (seats[seat_dead]["hcp"] >= dead_min and seats[seat_dead]["hcp"] <= dead_max):
 			break
 	print(tries)
 	deal_cards_seats()
-	'''
-	if Global.hands[hand_selected]["AffectedHands"] == 0:
-		if Global.hands[hand_selected]["inverse"]:
-			notrumph_main_hand(1, Global.hands[hand_selected]["offMinHonorPoints"], Global.hands[hand_selected]["offMaxHonorPoints"])
-			notrumph_off_hand(3, Global.hands[hand_selected]["mainMinHonorPoints"], Global.hands[hand_selected]["mainMaxHonorPoints"])
-		else:
-			notrumph_main_hand(1, Global.hands[hand_selected]["mainMinHonorPoints"], Global.hands[hand_selected]["mainMaxHonorPoints"])
-			notrumph_off_hand(3, Global.hands[hand_selected]["offMinHonorPoints"], Global.hands[hand_selected]["offMaxHonorPoints"])
-		fill_rest_hands([2,4])
-	else:
-		if Global.hands[hand_selected]["inverse"]:
-			notrumph_main_hand(2, Global.hands[hand_selected]["offMinHonorPoints"], Global.hands[hand_selected]["offMaxHonorPoints"])
-			notrumph_off_hand(4, Global.hands[hand_selected]["mainMinHonorPoints"], Global.hands[hand_selected]["mainMaxHonorPoints"])
-		else:
-			notrumph_main_hand(2, Global.hands[hand_selected]["mainMinHonorPoints"], Global.hands[hand_selected]["mainMaxHonorPoints"])
-			notrumph_off_hand(4, Global.hands[hand_selected]["offMinHonorPoints"], Global.hands[hand_selected]["offMaxHonorPoints"])
-		fill_rest_hands([1,3])
-	'''
 
 func deal_cards_seats():
 	for i in seats:
@@ -443,297 +552,71 @@ func deal_cards_seats():
 					j.visible = false
 					j.card_visible = true
 					j.player = 3
+					$Norte/Hand.regular = seats[i]["regular"]
+					$Norte/Hand.balanced = seats[i]["balanced"]
+					$Norte/Hand.distribution_points = seats[i]["dp"]
 					$Norte/Hand.add_card(j)
 				"south":
 					j.card_visible = true
 					j.player = 1
+					$Player1/Hand.regular = seats[i]["regular"]
+					$Player1/Hand.balanced = seats[i]["balanced"]
+					$Player1/Hand.distribution_points = seats[i]["dp"]
 					$Player1/Hand.add_card(j)
 				"east":
 					j.player = 4
+					$Este/Hand.regular = seats[i]["regular"]
+					$Este/Hand.balanced = seats[i]["balanced"]
+					$Este/Hand.distribution_points = seats[i]["dp"]
 					$Este/Hand.add_card(j)
+					prepare_visible_hand(4, j.value, j.symbol, j.card_cover)
 				"west":
 					j.player = 2
+					$Oeste/Hand.regular = seats[i]["regular"]
+					$Oeste/Hand.balanced = seats[i]["balanced"]
+					$Oeste/Hand.distribution_points = seats[i]["dp"]
 					$Oeste/Hand.add_card(j)
+					prepare_visible_hand(2, j.value, j.symbol, j.card_cover)
 	$Player1/Hand.reconnect_signals()
 	$Oeste/Hand.reconnect_signals()
 	$Norte/Hand.reconnect_signals()
 	$Este/Hand.reconnect_signals()
 
-func _on_deal_random_pressed():
-	test()
+func prepare_visible_hand(hand : int, cardValue : int, cardSymbol : int, resource : String) -> void:
+	var newRect : TextureRect = TextureRect.new()
+	newRect.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	newRect.texture = load("res://Graphics/cards/" + resource + ".png")
+	newRect.name = str(cardSymbol) + str(cardValue)
+	newRect.custom_minimum_size = Vector2(75,125)
+	newRect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var hcontainer : HBoxContainer
+	if hand == 2:
+		hcontainer = get_node("Oeste/visibleHand/" + str(cardSymbol))
+	else:
+		hcontainer = get_node("Este/visibleHand/" + str(cardSymbol))
+	hcontainer.add_child(newRect)
+
+func _on_deal_random_pressed() -> void:
+	generate_hands()
 	deal_cards_seats()
 
-func get_amount_of_points(pointsToReach: int):
-	var point_dict = {}
-	var sum = 0
-	while true:
-		var rand_value = randi_range(11, 14)
-		if not point_dict.has(rand_value):
-			point_dict[rand_value] = 1
-		else:
-			if point_dict[rand_value] == 4:
-				continue
-			point_dict[rand_value] += 1
-		sum += rand_value % 10
-		var rest =  sum - pointsToReach
-		if rest == 0:
-			return point_dict
-		elif rest > 0:
-			if point_dict.has(rest + 10):
-				point_dict[rest + 10] -= 1
-				if point_dict[rest + 10] == 0:
-					point_dict.erase(rest + 10)
-				return point_dict
-			elif point_dict.has(rest + 11):
-				point_dict[rest + 11] -= 1
-				if point_dict[rest + 11] == 0:
-					point_dict.erase(rest + 11)
-				if point_dict.has(11):
-					if point_dict[11] != 4:
-						point_dict[11] += 11
-			return point_dict
-			
-func notrumph_main_hand(player : int, min_value : int, max_value : int) -> void:
-	#var type = NOTRUMPHHANDS.values().pick_random()
-	var type = NOTRUMPHHANDS.UNBALANCED
-	var main_hand_value = randi_range(min_value, max_value)
-	var type_counter = [0,0,0,0]
-	value_dict = get_amount_of_points(main_hand_value)
-	var cards_added = 0
-	for value in value_dict:
-		var amount = value_dict[value]
-		while amount != 0:
-			var rand_type = randi_range(1,4)
-			if cardsGot.has((rand_type * 100) + value):
-				continue
-			type_counter[rand_type - 1] += 1
-			search_card(rand_type, value, player)
-			cardsGot[(rand_type * 100) + value] = 0
-			cards_added += 1
-			amount -= 1
-	match type:
-		NOTRUMPHHANDS.BALANCED:
-			notrumph_balanced(type_counter, player, cards_added)
-		NOTRUMPHHANDS.ONESEMIFAIL:
-			notrump_semifail(type_counter, player, cards_added)
-		NOTRUMPHHANDS.UNBALANCED:
-			notrump_unbalanced(type_counter, player, cards_added)
-					
-func notrumph_balanced(type_counter : Array, player : int, cards_added : int) -> void :
-	var symbols_available = {}
-	var four_in_one = true
-	for i in type_counter.size():
-		symbols_available[i+1] = type_counter[i] 
-	for i in symbols_available:
-		if symbols_available[i] == 4:
-			four_in_one = false
-			symbols_available.erase(i)
+func removeVisibleCar(player : int) -> void:
+	var hcontainer : HBoxContainer
+	var last_card : CardUI = $TableCards.get_children().back()
+	var card_name := str(last_card.symbol) + str(last_card.value)
+	if player == 2:
+		hcontainer = get_node("Oeste/visibleHand/" + str(last_card.symbol))
+	else:
+		hcontainer = get_node("Este/visibleHand/" + str(last_card.symbol))
+	pass
+	for i : TextureRect in hcontainer.get_children():
+		if i.name == card_name:
+			i.queue_free()
 			break
-	if not four_in_one:
-		for i in symbols_available:
-			if symbols_available[i] == 3:
-				symbols_available.erase(i)
-	while true:
-		var rand_value = randi_range(2, 10)
-		var symbol = randi_range(1, 4)
-		if not symbols_available.has(symbol):
-			continue
-		if cardsGot.has((symbol * 100) + rand_value):
-			continue
-		search_card(symbol, rand_value, player)
-		cardsGot[(symbol * 100) + rand_value] = 0
-		symbols_available[symbol] += 1
-		cards_added += 1
-		if four_in_one and symbols_available[symbol] == 4:
-			symbols_available.erase(symbol)
-			four_in_one = false
-			for i in symbols_available:
-				if symbols_available[i] == 3:
-					symbols_available.erase(i)
-		elif not four_in_one and symbols_available[symbol] == 3:
-			symbols_available.erase(symbol)
-		if symbols_available.is_empty() or cards_added == 13:
-			break
-	
-func notrump_semifail(type_counter : Array, player : int, cards_added : int) -> void:
-	var symbols_available = {}
-	var four_same_symbol = 0
-	var already_found_two = false
-	for i in type_counter.size():
-		if type_counter[i] < 4:
-			symbols_available[i+1] = type_counter[i]
-		else:
-			four_same_symbol += 1
-	while true:
-		if cards_added == 13 or symbols_available.is_empty():
-			break
-		var rand_value = randi_range(2, 10)
-		var symbol = randi_range(1, 4)
-		if not symbols_available.has(symbol):
-			continue
-		if symbols_available[symbol] == 2 and not already_found_two:
-			var all_higher_than_two = true
-			for i in symbols_available:
-				if symbols_available[i] < 2:
-					all_higher_than_two = false
-			if all_higher_than_two:
-				already_found_two = true
-				symbols_available.erase(symbol)
-				continue
-		if cardsGot.has(((symbol) * 100) + rand_value):
-			continue
-		search_card((symbol), rand_value, player)
-		cardsGot[((symbol) * 100) + rand_value] = 0
-		symbols_available[symbol] += 1
-		if four_same_symbol >= 2 and symbols_available[symbol] == 3:
-			symbols_available.erase(symbol)
-		elif symbols_available[symbol] == 4:
-			four_same_symbol += 1
-			symbols_available.erase(symbol)
-		cards_added += 1
-
-func notrump_unbalanced(type_counter : Array, player : int, cards_added : int) -> void:
-	var symbols_available = []
-	var three_same_symbol = 0
-	var two_row_done = false
-	var low_brand_retired = 0
-	for i in type_counter.size():
-		if i > 1 and type_counter[i] == 3:
-			three_same_symbol += 1
-		else:
-			symbols_available.append(i)
-	while true:
-		if cards_added == 13:
-			break
-		var symbol = symbols_available.pick_random()
-		if type_counter[symbol] == 2 and not two_row_done:
-			two_row_done = true
-			if symbol < 2:
-				if low_brand_retired == 0:
-					low_brand_retired += 1
-					symbols_available.remove_at(symbols_available.find(symbol))
-					continue
-			else:
-				symbols_available.remove_at(symbols_available.find(symbol))
-				continue
-		var rand_value = randi_range(2, 10)
-		if cardsGot.has(((symbol + 1) * 100) + rand_value):
-			continue
-		search_card((symbol + 1), rand_value, player)
-		cardsGot[((symbol + 1) * 100) + rand_value] = 0
-		type_counter[symbol] += 1
-		cards_added += 1
-		if type_counter[symbol] == 3:
-			three_same_symbol += 1
-			if symbol < 2:
-				if low_brand_retired == 1:
-					continue
-				else:
-					low_brand_retired += 1
-			symbols_available.remove_at(symbols_available.find(symbol))
-		elif type_counter[symbol] == 5:
-			symbols_available.remove_at(symbols_available.find(symbol))
-	
-func notrumph_off_hand(player : int, min_value : int, max_value : int) -> void:
-	var leftover_points = {}
-	var combination = {}
-	for i in value_dict:
-		var lefts = 4 - value_dict[i]
-		combination[i] = 0
-		if i != 0: 
-			leftover_points[i] = lefts
-	var tries = 0
-	var accumulated = 0
-	var counter = 0
-	var leftover_points_copy = leftover_points.duplicate()
-	var main_hand_value = randi_range(min_value, max_value)
-	var remaining = main_hand_value
-	while true:
-		if main_hand_value == 0:
-			break
-		var rand_type = randi_range(1,4)
-		var symbol = randi_range(11, 14)
-		if not leftover_points.has(symbol):
-			tries += 1
-			if tries >= 15:
-				for j in combination:
-					combination[j] = 0
-				accumulated = 0
-				leftover_points = leftover_points_copy.duplicate()
-				remaining = randi_range(min_value, max_value)
-			continue
-		if cardsGot.has((rand_type * 100) + symbol):
-			tries += 1
-			if tries >= 15:
-				for j in combination:
-					combination[j] = 0
-				accumulated = 0
-				leftover_points = leftover_points_copy.duplicate()
-				remaining = randi_range(min_value, max_value)
-			continue
-		if remaining - ((symbol-10) + accumulated) == 0:
-			combination[symbol] += 1
-			break
-		elif remaining - ((symbol-10) + accumulated) > 0:
-			combination[symbol] += 1
-			leftover_points[symbol] -= 1
-			if leftover_points[symbol] == 0:
-				leftover_points.erase(symbol)
-			accumulated += (symbol - 10)
-		else:
-			tries += 1
-			if tries >= 15:
-				for j in combination:
-					combination[j] = 0
-				accumulated = 0
-				leftover_points = leftover_points_copy.duplicate()
-				remaining = randi_range(min_value, max_value)
-	while true:
-		if combination.is_empty():
-			break
-		var rand_type = randi_range(1,4)
-		var symbol = randi_range(11, 14)
-		if not combination.has(symbol):
-			continue
-		if combination[symbol] <= 0:
-			combination.erase(symbol)
-			continue
-		if cardsGot.has((rand_type * 100) + symbol):
-			continue
-		search_card(rand_type, symbol , player)
-		cardsGot[(rand_type * 100) + symbol] = 0
-		counter += 1
-		combination[symbol] -= 1
-	while true:
-		var rand_type = randi_range(1,4)
-		var rand_value = randi_range(2, 10)
-		if cardsGot.has((rand_type * 100) + rand_value):
-			continue
-		search_card(rand_type, rand_value, player)
-		cardsGot[(rand_type * 100) + rand_value] = 0
-		counter += 1
-		if counter == 13:
-			break
-
-func search_card(symbol : int, value : int, player : int) -> void:
-	for j in cards_instatiated.size():
-		if cards_instatiated[j].symbol != symbol or cards_instatiated[j].value != value:
-			continue
-		cards_instatiated[j].card_visible = true
-		cards_instatiated[j].player = player
-		match player:
-			1:
-				$Player1/Hand.add_card(cards_instatiated.pop_at(j))
-			2:
-				$Oeste/Hand.add_card(cards_instatiated.pop_at(j))
-			3:
-				cards_instatiated[j].visible = false
-				$Norte/Hand.add_card(cards_instatiated.pop_at(j))
-			4:
-				$Este/Hand.add_card(cards_instatiated.pop_at(j))
-		break
 
 func _on_player_played(player_turn_ended : int) -> void:
+	if player_turn_ended == 2 or player_turn_ended == 4:
+		removeVisibleCar(player_turn_ended)
 	var next_turn = player_turn_ended + 1
 	cards_played += 1
 	$Panel/Help.disabled = true
@@ -743,7 +626,13 @@ func _on_player_played(player_turn_ended : int) -> void:
 		next_turn = await check_winner_of_round()
 		cards_played = 0
 	if $Rounds.get_child_count() == 13:
-		print("se acabo la partida")
+		$Panel2/VBoxContainer/HBoxContainer.visible = false
+		$Panel2/VBoxContainer/HBoxContainer2/Label.text = ""
+		if $Panel/WonCounter.text.to_int() >= dealAmount + 6:
+			$Panel2/VBoxContainer/HBoxContainer2/Label2.text = "Se cumplio el contrato"
+		else:
+			$Panel2/VBoxContainer/HBoxContainer2/Label2.text = "Fallo el contrato"
+		$Panel2/AnimationPlayer.play("simple_pop_up")
 		return
 	player_turn = next_turn
 	match next_turn:
@@ -790,6 +679,14 @@ func check_winner_of_round() -> int:
 							winner = card_ui.player
 							winner_symbol = card_ui.symbol
 							winner_value = card_ui.value
+					else:
+						if winner_symbol != card_ui.symbol:
+							continue
+						else:
+							if winner_value < card_ui.value:
+								winner = card_ui.player
+								winner_symbol = card_ui.symbol
+								winner_value = card_ui.value
 	var new_node : Node = Node.new()
 	match winner:
 		1:

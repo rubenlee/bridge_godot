@@ -1,11 +1,11 @@
-[gd_scene load_steps=13 format=3 uid="uid://cmaukf222851u"]
+[gd_scene load_steps=13 format=3 uid="uid://bmqt4qrrghudt"]
 
-[ext_resource type="Script" path="res://scenes/table/table.gd" id="1_n22v4"]
-[ext_resource type="Texture2D" uid="uid://dihasscgbbns5" path="res://Graphics/34379.jpg" id="2_3ayww"]
-[ext_resource type="PackedScene" uid="uid://q3vx4alcf1x8" path="res://scenes/bidding/bidding.tscn" id="3_cjqa6"]
-[ext_resource type="PackedScene" uid="uid://b8scu1hn1isma" path="res://scenes/hand/hand.tscn" id="4_b7f7c"]
-[ext_resource type="Theme" uid="uid://g5w7cullef56" path="res://default.tres" id="5_ctmoa"]
-[ext_resource type="Theme" uid="uid://bgr0ko6oidt8p" path="res://help.tres" id="6_ipk0h"]
+[ext_resource type="Script" path="res://scenes/table/table.gd" id="1_orp4p"]
+[ext_resource type="Texture2D" uid="uid://dihasscgbbns5" path="res://Graphics/34379.jpg" id="2_bd12h"]
+[ext_resource type="PackedScene" uid="uid://q3vx4alcf1x8" path="res://scenes/bidding/bidding.tscn" id="3_xpam6"]
+[ext_resource type="PackedScene" uid="uid://b8scu1hn1isma" path="res://scenes/hand/hand.tscn" id="4_ff86f"]
+[ext_resource type="Theme" uid="uid://g5w7cullef56" path="res://default.tres" id="5_61rxa"]
+[ext_resource type="Theme" uid="uid://bgr0ko6oidt8p" path="res://help.tres" id="6_n0nyk"]
 
 [sub_resource type="Animation" id="Animation_oul6w"]
 resource_name = "simple_pop_up"
@@ -80,25 +80,25 @@ _data = {
 }
 
 [node name="Table" type="Node2D" groups=["root"]]
-script = ExtResource("1_n22v4")
+script = ExtResource("1_orp4p")
 
 [node name="background" type="TextureRect" parent="."]
 modulate = Color(0.541176, 0.541176, 0.541176, 1)
 scale = Vector2(0.855, 0.72)
-texture = ExtResource("2_3ayww")
+texture = ExtResource("2_bd12h")
 metadata/_edit_lock_ = true
 
-[node name="bidding" parent="." instance=ExtResource("3_cjqa6")]
+[node name="bidding" parent="." instance=ExtResource("3_xpam6")]
 
 [node name="TableCards" type="CanvasLayer" parent="." groups=["table"]]
 
 [node name="Player1" type="CanvasLayer" parent="." groups=["ui_layer"]]
 
-[node name="Hand" parent="Player1" instance=ExtResource("4_b7f7c")]
+[node name="Hand" parent="Player1" instance=ExtResource("4_ff86f")]
 
 [node name="Oeste" type="CanvasLayer" parent="."]
 
-[node name="Hand" parent="Oeste" instance=ExtResource("4_b7f7c")]
+[node name="Hand" parent="Oeste" instance=ExtResource("4_ff86f")]
 custom_minimum_size = Vector2(400, 0)
 anchors_preset = 4
 anchor_left = 0.0
@@ -112,30 +112,9 @@ offset_bottom = 35.0
 grow_horizontal = 1
 grow_vertical = 2
 
-[node name="visibleHand" type="VBoxContainer" parent="Oeste"]
-visible = false
-layout_direction = 2
-offset_top = 165.0
-offset_right = 312.0
-offset_bottom = 710.0
-scale = Vector2(0.6, 0.6)
-mouse_filter = 2
-
-[node name="1" type="HBoxContainer" parent="Oeste/visibleHand"]
-layout_mode = 2
-
-[node name="2" type="HBoxContainer" parent="Oeste/visibleHand"]
-layout_mode = 2
-
-[node name="3" type="HBoxContainer" parent="Oeste/visibleHand"]
-layout_mode = 2
-
-[node name="4" type="HBoxContainer" parent="Oeste/visibleHand"]
-layout_mode = 2
-
 [node name="Norte" type="CanvasLayer" parent="." groups=["ui_layer2"]]
 
-[node name="Hand" parent="Norte" instance=ExtResource("4_b7f7c")]
+[node name="Hand" parent="Norte" instance=ExtResource("4_ff86f")]
 anchors_preset = 5
 anchor_top = 0.0
 anchor_bottom = 0.0
@@ -145,43 +124,18 @@ grow_vertical = 1
 
 [node name="Este" type="CanvasLayer" parent="."]
 
-[node name="Hand" parent="Este" instance=ExtResource("4_b7f7c")]
+[node name="Hand" parent="Este" instance=ExtResource("4_ff86f")]
 anchors_preset = 4
 anchor_left = 0.0
 anchor_top = 0.5
 anchor_right = 0.0
 anchor_bottom = 0.5
 offset_left = 1283.0
-offset_top = -27.0
+offset_top = -25.0
 offset_right = 1823.0
-offset_bottom = 33.0
+offset_bottom = 35.0
 grow_horizontal = 1
 grow_vertical = 2
-
-[node name="visibleHand" type="VBoxContainer" parent="Este"]
-visible = false
-layout_direction = 3
-offset_left = -131.0
-offset_top = 173.0
-offset_right = 181.0
-offset_bottom = 718.0
-scale = Vector2(0.6, 0.6)
-mouse_filter = 2
-
-[node name="1" type="HBoxContainer" parent="Este/visibleHand"]
-layout_mode = 2
-
-[node name="TextureRect" type="TextureRect" parent="Este/visibleHand/1"]
-layout_mode = 2
-
-[node name="2" type="HBoxContainer" parent="Este/visibleHand"]
-layout_mode = 2
-
-[node name="3" type="HBoxContainer" parent="Este/visibleHand"]
-layout_mode = 2
-
-[node name="4" type="HBoxContainer" parent="Este/visibleHand"]
-layout_mode = 2
 
 [node name="Panel" type="Panel" parent="."]
 anchors_preset = 12
@@ -208,7 +162,7 @@ offset_bottom = -3.0
 grow_horizontal = 0
 grow_vertical = 0
 focus_mode = 0
-theme = ExtResource("5_ctmoa")
+theme = ExtResource("5_61rxa")
 disabled = true
 text = "Ayuda"
 
@@ -222,7 +176,7 @@ offset_top = -48.5
 offset_right = 192.0
 offset_bottom = 49.5
 grow_vertical = 2
-theme = ExtResource("5_ctmoa")
+theme = ExtResource("5_61rxa")
 theme_override_colors/font_uneditable_color = Color(0.803922, 0, 0, 1)
 text = "0"
 alignment = 1
@@ -245,7 +199,7 @@ offset_top = -49.0
 offset_right = 96.0
 offset_bottom = 49.0
 grow_vertical = 2
-theme = ExtResource("5_ctmoa")
+theme = ExtResource("5_61rxa")
 theme_override_colors/font_uneditable_color = Color(0, 1, 0, 1)
 text = "0"
 alignment = 1
@@ -272,7 +226,7 @@ offset_right = -200.5
 offset_bottom = -25.0
 grow_horizontal = 2
 grow_vertical = 0
-theme = ExtResource("5_ctmoa")
+theme = ExtResource("5_61rxa")
 theme_override_colors/font_uneditable_color = Color(1, 1, 1, 1)
 text = "Jugando:"
 editable = false
@@ -298,7 +252,7 @@ offset_right = 13.5
 offset_bottom = -25.0
 grow_horizontal = 2
 grow_vertical = 0
-theme = ExtResource("5_ctmoa")
+theme = ExtResource("5_61rxa")
 theme_override_colors/font_uneditable_color = Color(1, 1, 1, 1)
 editable = false
 context_menu_enabled = false
@@ -316,7 +270,7 @@ offset_left = 984.0
 offset_right = 1131.0
 offset_bottom = 93.0
 focus_mode = 0
-theme = ExtResource("5_ctmoa")
+theme = ExtResource("5_61rxa")
 text = "Reiniciar
 manos"
 
@@ -326,7 +280,7 @@ offset_left = 1133.0
 offset_right = 1280.0
 offset_bottom = 93.0
 focus_mode = 0
-theme = ExtResource("5_ctmoa")
+theme = ExtResource("5_61rxa")
 text = "Volver"
 
 [node name="Rounds" type="Node" parent="."]
@@ -355,12 +309,12 @@ alignment = 1
 
 [node name="Label" type="Label" parent="Panel2/VBoxContainer/HBoxContainer"]
 layout_mode = 2
-theme = ExtResource("5_ctmoa")
+theme = ExtResource("5_61rxa")
 text = "Jugando apuesta: "
 
 [node name="Label2" type="Label" parent="Panel2/VBoxContainer/HBoxContainer"]
 layout_mode = 2
-theme = ExtResource("5_ctmoa")
+theme = ExtResource("5_61rxa")
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="Panel2/VBoxContainer"]
 layout_mode = 2
@@ -368,12 +322,12 @@ alignment = 1
 
 [node name="Label" type="Label" parent="Panel2/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
-theme = ExtResource("5_ctmoa")
+theme = ExtResource("5_61rxa")
 text = "Empieza: "
 
 [node name="Label2" type="Label" parent="Panel2/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
-theme = ExtResource("5_ctmoa")
+theme = ExtResource("5_61rxa")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Panel2"]
 libraries = {
@@ -392,7 +346,7 @@ offset_right = 1777.0
 offset_bottom = 462.0
 grow_horizontal = 0
 grow_vertical = 2
-theme = ExtResource("6_ipk0h")
+theme = ExtResource("6_n0nyk")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="helpPanel"]
 libraries = {
@@ -409,7 +363,7 @@ offset_right = -0.000244141
 offset_bottom = -12.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("5_ctmoa")
+theme = ExtResource("5_61rxa")
 
 [connection signal="pressed" from="Panel/Help" to="." method="_on_help_pressed"]
 [connection signal="pressed" from="Panel/reset" to="." method="_on_reset_pressed"]

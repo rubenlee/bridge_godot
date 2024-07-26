@@ -6,10 +6,12 @@ signal bidding_over(whom_ended : int, bid_dealt : String)
 @onready var positionInTable: Vector2
 @onready var positionToMoveToTable : Vector2
 
-var cards_dict = {}
+var cards_dict := {}
 var playerInd : int
-var mode: int
-var honor_points: int = 0
+var honor_points := 0
+var distribution_points := 0
+var balanced := false
+var regular := false
 
 func _ready():
 	var parentName : String = self.get_parent().name
@@ -148,50 +150,83 @@ func start_turn():
 			selectable_cards()
 	else:
 		match root.symbolPreferred:
-			5:
-				no_trumph_thinking()
 			_:
-				child.card_clicked()
+				no_trumph_thinking()
+
 
 func bidding_thinking(bid_value : int, symbol_value : int, player_voted : int) -> void:
 	var bid_result = "pass"
 	var par = player_voted % 2
 	if bid_value == 0:
-		if honor_points >= 15 and honor_points <= 17:
+		if honor_points >= 15 and honor_points <= 17 and balanced:
 			bid_result = "1NT"
-		elif honor_points >= 20 and honor_points <= 21:
+		elif honor_points >= 20 and honor_points <= 22 and balanced:
 			bid_result = "2NT"
-		elif honor_points > 24:
+		elif honor_points > 24 and balanced:
 			bid_result = "3NT"
+		elif honor_points > 11 and honor_points < 21:
+			for i in cards_dict:
+				if cards_dict[i].size() >= 5:
+					bid_result = "1" + get_string_symbol(i)
 	else:
 		match bid_value:
 			1:
-				if symbol_value == 5 and par == playerInd % 2:
-					if honor_points > 9:
-						bid_result = "3NT"
-					elif honor_points > 7:
-						bid_result = "2NT"
-			
+				match symbol_value:
+					5:
+						if par == playerInd % 2:
+							if honor_points > 9:
+								bid_result = "3NT"
+							elif honor_points > 7:
+								bid_result = "2NT"
+					_:
+						if par == playerInd % 2:
+							if cards_dict[symbol_value].size() > 2:
+								if honor_points + distribution_points >= 6 and honor_points + distribution_points <= 10:
+									bid_result = "2" + get_string_symbol(symbol_value)
+								elif honor_points + distribution_points >= 11 and honor_points + distribution_points <= 12:
+									bid_result = "3" + get_string_symbol(symbol_value)
+								elif honor_points + distribution_points >= 11 and honor_points + distribution_points <= 12:
+									bid_result = "4" + get_string_symbol(symbol_value)
 	bidding_over.emit(playerInd, bid_result)	
+
+func get_string_symbol(value : int) -> String:
+	var result := ""
+	match value:
+		1:
+			result  = "C"
+		2:
+			result  = "D"
+		3:
+			result  = "H"
+		4:
+			result  = "S"
+	return result
 
 func no_trumph_thinking() -> void:
 	var table_layer := get_tree().get_first_node_in_group("table")
+	var root := get_tree().get_first_node_in_group("root") as Table
 	var symbol_used : int
 	var value_used : int = 0
 	var cards_played = table_layer.get_child_count()
 	if cards_played > 0:
 		var first_card = table_layer.get_child(0) as CardUI
 		var array_values : Array = []
-		if cards_dict.has(first_card.symbol):
-			array_values = cards_dict[first_card.symbol]
 		symbol_used = first_card.symbol
+		if cards_dict.has(symbol_used):
+			array_values = cards_dict[symbol_used]
 		if array_values.is_empty():
 			value_used = 100
-			for symbol in cards_dict:
-				for value in cards_dict[symbol]:
+			if symbol_used != root.symbolPreferred and cards_dict.has(root.symbolPreferred):
+				symbol_used = root.symbolPreferred
+				for value in cards_dict[symbol_used]:
 					if value < value_used:
 						value_used = value
-						symbol_used = symbol
+			else:
+				for symbol in cards_dict:
+					for value in cards_dict[symbol]:
+						if value < value_used:
+							value_used = value
+							symbol_used = symbol
 		else:
 			for value in cards_dict[symbol_used]:
 				if value > value_used:
@@ -204,6 +239,8 @@ func no_trumph_thinking() -> void:
 					symbol_used = symbol
 	var x = cards_dict[symbol_used].find(value_used)
 	cards_dict[symbol_used].remove_at(x)
+	if cards_dict[symbol_used].is_empty():
+		cards_dict.erase(symbol_used)
 	for child in get_children():
 		if not child is CardUI:
 			continue

@@ -12,12 +12,12 @@ func add_new_hand():
 	var new_label : Label = Label.new()
 	var default_theme : Theme = load("res://default.tres")
 	var label_string : String = "R:" + $PanelContainer/HBoxContainer5/OptionButton2.text + "|J:" + $PanelContainer/HBoxContainer/OptionButton2.text
-	label_string += "|" + $PanelContainer/Mano.text + ":PH:" + str($PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value.value)
-	if $PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value.value != $PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value2.value:
-		label_string += "-" + str($PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value2.value)
-	label_string += "|" + $PanelContainer/Mano2.text + ":PH:" + str($PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value.value)
-	if $PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value.value != $PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value2.value:
-		label_string += "-" + str($PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value2.value)
+	label_string += "|" + $PanelContainer/Mano.text + ":PH:" + str($PanelContainer/HBoxContainer2/honorPoint/VBoxContainer/HBoxContainer/value.value)
+	if $PanelContainer/HBoxContainer2/honorPoint/VBoxContainer/HBoxContainer/value.value != $PanelContainer/HBoxContainer2/honorPoint/VBoxContainer/HBoxContainer/value2.value:
+		label_string += "-" + str($PanelContainer/HBoxContainer2/honorPoint/VBoxContainer/HBoxContainer/value2.value)
+	label_string += "|" + $PanelContainer/Mano2.text + ":PH:" + str($PanelContainer/HBoxContainer3/honorPoint2/VBoxContainer2/HBoxContainer/value.value)
+	if $PanelContainer/HBoxContainer3/honorPoint2/VBoxContainer2/HBoxContainer/value.value != $PanelContainer/HBoxContainer3/honorPoint2/VBoxContainer2/HBoxContainer/value2.value:
+		label_string += "-" + str($PanelContainer/HBoxContainer3/honorPoint2/VBoxContainer2/HBoxContainer/value2.value)
 	new_button.text = "X"
 	new_hbox.add_child(new_button)
 	new_hbox.add_child(new_label)
@@ -36,10 +36,14 @@ func _on_add_pressed():
 	new_hand["Dealer"] = $PanelContainer/HBoxContainer5/OptionButton2.get_selected_id()
 	new_hand["AffectedHands"] = $PanelContainer/HBoxContainer4/OptionButton2.get_selected_id()
 	new_hand["Game"] = $PanelContainer/HBoxContainer/OptionButton2.get_selected_id() 
-	new_hand["mainMinHonorPoints"] = $PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value.value
-	new_hand["mainMaxHonorPoints"] = $PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value2.value
-	new_hand["offMinHonorPoints"] = $PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value.value
-	new_hand["offMaxHonorPoints"] =  $PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value2.value
+	new_hand["mainMinHonorPoints"] = $PanelContainer/HBoxContainer2/honorPoint/VBoxContainer/HBoxContainer/value.value
+	new_hand["mainMaxHonorPoints"] = $PanelContainer/HBoxContainer2/honorPoint/VBoxContainer/HBoxContainer/value2.value
+	new_hand["mainMinDistributionPoints"] = $PanelContainer/HBoxContainer2/distributionPoint/VBoxContainer2/HBoxContainer/value.value
+	new_hand["mainMaxDistributionPoints"] =  $PanelContainer/HBoxContainer2/distributionPoint/VBoxContainer2/HBoxContainer/value2.value
+	new_hand["offMinHonorPoints"] = $PanelContainer/HBoxContainer3/honorPoint2/VBoxContainer2/HBoxContainer/value.value
+	new_hand["offMaxHonorPoints"] = $PanelContainer/HBoxContainer3/honorPoint2/VBoxContainer2/HBoxContainer/value2.value
+	new_hand["offMinDistributionPoints"] = $PanelContainer/HBoxContainer3/distributionPoint2/VBoxContainer2/HBoxContainer/value.value
+	new_hand["offMaxDistributionPoints"] = $PanelContainer/HBoxContainer3/distributionPoint2/VBoxContainer2/HBoxContainer/value2.value
 	new_hand["inverse"] = false
 	if new_hand["mainMaxHonorPoints"] < new_hand["offMaxHonorPoints"]:
 		new_hand["inverse"] = true
@@ -75,14 +79,10 @@ func _on_deal_selected(index):
 	match index:
 		0:
 			visible_distribution = false
-		1:
-			visible_distribution = false
 		_:
 			pass
-	$Label3.visible = visible_distribution
-	$Label4.visible = visible_distribution
-	#$PanelContainer/distributionPoint.visible = visible_distribution
-	#$PanelContainer/distributionPoint2.visible = visible_distribution
+	$PanelContainer/HBoxContainer2/distributionPoint.visible = visible_distribution
+	$PanelContainer/HBoxContainer3/distributionPoint2.visible = visible_distribution
 
 
 func _on_preset_button_pressed():
@@ -93,26 +93,27 @@ func _on_preset_button_pressed():
 		_on_deal_selected(0)
 	match $VBoxContainer/presetOption.get_selected_id():
 		0:
-			$PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value.value = 15
-			$PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value2.value = 17
-			$PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value.value = 0
-			$PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value2.value = 7
+			$PanelContainer/HBoxContainer3/honorPoint2/VBoxContainer2/HBoxContainer/value.value = 15
+			$PanelContainer/HBoxContainer3/honorPoint2/VBoxContainer2/HBoxContainer/value2.value = 17
+			$PanelContainer/HBoxContainer2/honorPoint/VBoxContainer/HBoxContainer/value.value = 0
+			$PanelContainer/HBoxContainer2/honorPoint/VBoxContainer/HBoxContainer/value2.value = 7
 		1:
-			$PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value.value = 15
-			$PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value2.value = 16
-			$PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value.value = 8
-			$PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value2.value = 9
+			$PanelContainer/HBoxContainer3/honorPoint2/VBoxContainer2/HBoxContainer/value.value = 15
+			$PanelContainer/HBoxContainer3/honorPoint2/VBoxContainer2/HBoxContainer/value2.value = 16
+			$PanelContainer/HBoxContainer2/honorPoint/VBoxContainer/HBoxContainer/value.value = 8
+			$PanelContainer/HBoxContainer2/honorPoint/VBoxContainer/HBoxContainer/value2.value = 9
 		2:
-			$PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value.value = 15
-			$PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value2.value = 17
-			$PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value.value = 10
-			$PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value2.value = 15
+			$PanelContainer/HBoxContainer3/honorPoint2/VBoxContainer2/HBoxContainer/value.value = 15
+			$PanelContainer/HBoxContainer3/honorPoint2/VBoxContainer2/HBoxContainer/value2.value = 17
+			$PanelContainer/HBoxContainer2/honorPoint/VBoxContainer/HBoxContainer/value.value = 10
+			$PanelContainer/HBoxContainer2/honorPoint/VBoxContainer/HBoxContainer/value2.value = 15
 			pass
 		3:
-			$PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value.value = 12
-			$PanelContainer/honorPoint2/VBoxContainer2/HBoxContainer/value2.value = 20
-			$PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value.value = 0
-			$PanelContainer/honorPoint/VBoxContainer/HBoxContainer/value2.value = 6
+			$PanelContainer/HBoxContainer3/honorPoint2/VBoxContainer2/HBoxContainer/value.value = 12
+			$PanelContainer/HBoxContainer3/honorPoint2/VBoxContainer2/HBoxContainer/value2.value = 19
+			$PanelContainer/HBoxContainer2/honorPoint/VBoxContainer/HBoxContainer/value.value = 0
+			$PanelContainer/HBoxContainer2/honorPoint/VBoxContainer/HBoxContainer/value2.value = 5
+			$PanelContainer/HBoxContainer3/distributionPoint2/VBoxContainer2/HBoxContainer/value2.value = 1
 			_on_deal_selected(3)
 			$PanelContainer/HBoxContainer/OptionButton2.select(3)
 			pass

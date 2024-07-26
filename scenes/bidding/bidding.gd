@@ -6,6 +6,8 @@ var highest_vote = 0
 var highest_vote_symbol = -1
 var highest_player_vote = -1
 var dealt = false
+var bid_log := []
+
 signal biddings_over(player_won_bid : int, symbol : int, deal_amount : int)
 
 func _ready():
@@ -60,6 +62,7 @@ func _on_bid_pressed(button : Button):
 		var root := get_tree().get_first_node_in_group("root") as Table
 		root._on_bidding_deal(player, button.name)
 	if button.text == "PASAR":
+		bid_log.append("")
 		pass_counter += 1
 		if pass_counter == 3:
 			deal_done()
@@ -68,6 +71,7 @@ func _on_bid_pressed(button : Button):
 	if button.icon != null:
 		new_label.text += "[img=30x30]" + button.icon.resource_path + "[/img]"
 	var temp_vote_symbol = get_symbol_value(button.name.substr(1))	
+	bid_log.append(button.text.substr(0,1) + str(temp_vote_symbol) + str(player))
 	highest_vote = value_label
 	if temp_vote_symbol != highest_vote_symbol and highest_player_vote % 2 != player % 2:
 		highest_vote_symbol = temp_vote_symbol
@@ -90,7 +94,7 @@ func get_symbol_value(symbol_str : String) -> int:
 		"NT":
 			return 5
 		_:
-			return 0
+			return 5
 
 func add_blank() -> void:
 	var new_label : RichTextLabel = $bid_result_grid/Label.duplicate()
