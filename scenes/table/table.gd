@@ -133,6 +133,7 @@ func prepare_cards() -> void:
 		
 func prepare_table() -> void:
 	var player = 0
+	var correct := true
 	if Global.hands.is_empty():
 		_on_deal_random_pressed()
 	else:
@@ -140,18 +141,18 @@ func prepare_table() -> void:
 		var selected_play = Global.hands[hand_selected]
 		player = selected_play["Dealer"]
 		match selected_play["Game"]:
+			0, 1, 2, 3:
+				correct = on_deal_suit()
 			4:
-				_on_deal_no_triumph_pressed()
-			0:
-				on_deal_suit()
-			1:
-				on_deal_suit()
-			2:
-				on_deal_suit()
-			3:
-				on_deal_suit()
+				correct = _on_deal_no_triumph_pressed()
 			_:
 				_on_deal_random_pressed()
+	if not correct:
+		$Panel2/VBoxContainer/HBoxContainer.visible = false
+		$Panel2/VBoxContainer/HBoxContainer2/Label.text = ""
+		$Panel2/VBoxContainer/HBoxContainer2/Label2.text = "No se pudo generar la mano \n con esas condiciones.\n Cambie de condiciones."
+		$Panel2/AnimationPlayer.play("simple_pop_up")
+		return
 	if player == 0:
 		player = randi_range(1,4)
 	if player == 1:
@@ -509,7 +510,7 @@ func count_winning_hands(main_hand : Hand, dead_hand_temp : Hand) -> int:
 						continue
 	return result
 
-func on_deal_suit():
+func on_deal_suit() -> bool:
 	var tries := 0
 	var seat_string := "north"
 	var seat_dead := "south"
@@ -546,10 +547,13 @@ func on_deal_suit():
 			seats[seat_dead]["hcp"] >= dead_min and seats[seat_dead]["hcp"] <= dead_max and \
 			seats[seat_dead]["dp"] >= dead_dist_min and seats[seat_dead]["dp"] <= dead_dist_max):
 			break
+		if tries == 10000:
+			return false
 	print(tries)
 	deal_cards_seats()
+	return true
 
-func _on_deal_no_triumph_pressed() -> void:
+func _on_deal_no_triumph_pressed() -> bool:
 	var tries := 0
 	var seat_string := "north"
 	var seat_dead := "south"
@@ -573,8 +577,11 @@ func _on_deal_no_triumph_pressed() -> void:
 		tries += 1
 		if (seats[seat_string]["balanced"] and seats[seat_string]["hcp"] >= main_min and seats[seat_string]["hcp"] <= main_max) and (seats[seat_dead]["hcp"] >= dead_min and seats[seat_dead]["hcp"] <= dead_max):
 			break
+		if tries == 10000:
+			return false
 	print(tries)
 	deal_cards_seats()
+	return true
 
 func deal_cards_seats():
 	for i in seats:
