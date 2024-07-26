@@ -180,7 +180,7 @@ func bidding_thinking(bid_value : int, symbol_value : int, player_voted : int) -
 								bid_result = "2NT"
 					_:
 						if par == playerInd % 2:
-							if cards_dict[symbol_value].size() > 2:
+							if cards_dict[symbol_value - 1].size() > 2:
 								if honor_points + distribution_points >= 6 and honor_points + distribution_points <= 10:
 									bid_result = "2" + get_string_symbol(symbol_value)
 								elif honor_points + distribution_points >= 11 and honor_points + distribution_points <= 12:
@@ -202,15 +202,28 @@ func get_string_symbol(value : int) -> String:
 			result  = "S"
 	return result
 
+func get_best_card_on_table_no_trumph() -> CardUI:
+	var table_layer := get_tree().get_first_node_in_group("table")
+	var result : CardUI = table_layer.get_child(0)
+	for card : CardUI in get_tree().get_first_node_in_group("table").get_children():
+		if result == card:
+			continue
+		if card.symbol == result.symbol:
+			if card.value > result.value:
+				result = card
+	return result
+	
 func no_trumph_thinking() -> void:
 	var table_layer := get_tree().get_first_node_in_group("table")
 	var root := get_tree().get_first_node_in_group("root") as Table
 	var symbol_used : int
 	var value_used : int = 0
 	var cards_played = table_layer.get_child_count()
+	var best_card : CardUI
 	if cards_played > 0:
 		var first_card = table_layer.get_child(0) as CardUI
 		var array_values : Array = []
+		best_card = get_best_card_on_table_no_trumph()
 		symbol_used = first_card.symbol
 		if cards_dict.has(symbol_used):
 			array_values = cards_dict[symbol_used]
@@ -228,9 +241,15 @@ func no_trumph_thinking() -> void:
 							value_used = value
 							symbol_used = symbol
 		else:
-			for value in cards_dict[symbol_used]:
+			
+			for value in cards_dict[symbol_used]:	
 				if value > value_used:
-					value_used = value
+						value_used = value
+			if best_card.player % 2 == playerInd % 2 and value_used < best_card.value:
+				value_used = 100
+				for value in cards_dict[symbol_used]:	
+					if value < value_used:
+							value_used = value
 	else:
 		for symbol in cards_dict:
 			for value in cards_dict[symbol]:
